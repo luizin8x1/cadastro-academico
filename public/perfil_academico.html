@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Do Sucesso - Perfil Académico</title>
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="stylelogin.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Configuração Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', 800: '#1e293b', 900: '#0f172a', 950: '#020617'
+                        }
+                    }
+                }
+            },
+            plugins: [
+                function({ addVariant }) {
+                    addVariant('hc', 'body.hc &');
+                }
+            ]
+        }
+    </script>
+</head>
+<body 
+    x-data="academicApp()" 
+    :class="{ 'dark': isDarkClass, 'hc': theme === 'hc' }"
+    class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-200 selection:text-blue-900 transition-colors duration-300 hc:bg-black hc:text-white min-h-screen flex"
+>
+    <div class="w-full min-h-screen flex flex-col md:flex-row dark:bg-slate-950 hc:bg-black relative">
+        
+        <!-- LADO ESQUERDO: Branding & Visual -->
+        <div class="hidden md:flex md:w-5/12 lg:w-1/2 bg-slate-900 dark:bg-slate-900/50 hc:bg-black hc:border-r-2 hc:border-white relative overflow-hidden flex-col justify-between p-12 text-white border-r border-slate-200/10">
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none hc:hidden"></div>
+            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none hc:hidden"></div>
+
+            <!-- Logo -->
+            <div class="flex items-center gap-3 z-10">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 hc:bg-yellow-400 hc:text-black flex items-center justify-center text-xl font-bold shadow-sm">
+                    <i class="ph-fill ph-graduation-cap"></i>
+                </div>
+                <span class="font-bold text-2xl tracking-tight">Rota Do Sucesso</span>
+            </div>
+
+            <!-- Card de Destaque -->
+            <div class="my-auto z-10 max-w-md">
+                <div class="bg-white/10 dark:bg-slate-800/60 hc:bg-black hc:border-2 hc:border-white glass-panel p-6 rounded-2xl border border-white/10 shadow-2xl mb-8">
+                    <div class="flex items-center gap-3 mb-3 text-blue-400 hc:text-yellow-400">
+                        <i class="ph-bold ph-user-focus text-2xl"></i>
+                        <span class="text-sm font-semibold uppercase tracking-wider">Personalização</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Quase lá!</h3>
+                    <p class="text-sm text-slate-300 hc:text-gray-300">
+                        Precisamos dessas informações para montar um plano de estudos totalmente adaptado às suas metas e rotina.
+                    </p>
+                </div>
+
+                <h1 class="text-3xl lg:text-4xl font-bold tracking-tight mb-4 leading-tight">
+                    Monte o seu Perfil Académico
+                </h1>
+                <p class="text-slate-400 hc:text-gray-300 text-base">
+                    Personalize sua experiência para receber cronogramas e métricas ajustados aos seus objetivos.
+                </p>
+            </div>
+
+            <!-- Rodapé esquerdo -->
+            <div class="z-10 flex items-center justify-between text-xs text-slate-400 hc:text-gray-400">
+                <span>© 2026 Rota Do sucesso</span>
+            </div>
+        </div>
+
+        <!-- LADO DIREITO: Formulário de Perfil Acadêmico -->
+        <div class="flex-1 flex flex-col justify-between p-6 sm:p-12 md:p-16 relative overflow-y-auto max-h-screen">
+            
+            <!-- Top Bar: Logo mobile + Seletor de Tema -->
+            <div class="flex items-center justify-between w-full max-w-2xl mx-auto gap-4">
+                <div class="flex md:hidden items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600 hc:bg-yellow-400 hc:text-black text-white flex items-center justify-center text-lg font-bold">
+                        <i class="ph-fill ph-graduation-cap"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight">Rota Do Sucesso</span>
+                </div>
+                
+                <div class="ml-auto flex items-center gap-3">
+                    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 hc:bg-black hc:border hc:border-white p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                        <button @click="theme = 'light'" :class="theme === 'light' ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Tema Claro">
+                            <i class="ph-bold ph-sun"></i>
+                        </button>
+                        <button @click="theme = 'dark'" :class="theme === 'dark' ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Tema Escuro">
+                            <i class="ph-bold ph-moon"></i>
+                        </button>
+                        <button @click="theme = 'hc'" :class="theme === 'hc' ? 'bg-white text-black font-bold' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Alto Contraste">
+                            <i class="ph-bold ph-circle-half-tilt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário Principal -->
+            <div class="w-full max-w-md mx-auto my-auto py-8">
+                
+                <div class="mb-6">
+                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Perfil Acadêmico</h2>
+                    <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300 text-sm">Preencha seus dados acadêmicos para finalizar seu cadastro.</p>
+                </div>
+
+                <form @submit.prevent="handleSubmit" class="space-y-5">
+                    
+                    <!-- Data de Nascimento -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1.5">Data de nascimento</label>
+                        <div class="relative flex items-center">
+                            <i class="ph ph-calendar-blank absolute left-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                            <input 
+                                type="date" 
+                                required
+                                x-model="dataNascimento"
+                                class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Série/Ano Escolar -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1.5">Série/Ano escolar (2026)</label>
+                        <div class="relative flex items-center">
+                            <i class="ph ph-student absolute left-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                            <select 
+                                required
+                                x-model="serie"
+                                class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white appearance-none"
+                            >
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="5_ef">5º Ano do Ensino Fundamental</option>
+                                <option value="6_ef">6º Ano do Ensino Fundamental</option>
+                                <option value="7_ef">7º Ano do Ensino Fundamental</option>
+                                <option value="8_ef">8º Ano do Ensino Fundamental</option>
+                                <option value="9_ef">9º Ano do Ensino Fundamental</option>
+                                <option value="1_em">1º Ano do Ensino Médio</option>
+                                <option value="2_em">2º Ano do Ensino Médio</option>
+                                <option value="3_em">3º Ano do Ensino Médio</option>
+                                
+                            </select>
+                            <i class="ph ph-caret-down absolute right-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <!-- Escola - Rede de ensino -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-2">Escola - Rede de ensino</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center gap-2 p-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl cursor-pointer hover:border-blue-500 transition-all">
+                                <input type="radio" name="rede_ensino" value="publica" required x-model="redeEnsino" class="accent-blue-600 hc:accent-yellow-400">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 hc:text-white">Pública</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl cursor-pointer hover:border-blue-500 transition-all">
+                                <input type="radio" name="rede_ensino" value="particular" required x-model="redeEnsino" class="accent-blue-600 hc:accent-yellow-400">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 hc:text-white">Particular</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Qual curso pretende fazer? -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1.5">Qual curso pretende fazer?</label>
+                        <div class="relative flex items-center">
+                            <i class="ph ph-book-open absolute left-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                            <input 
+                                type="text" 
+                                maxlength="50"
+                                x-model="curso"
+                                placeholder="Ex: Medicina, Engenharia, Direito..."
+                                class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Qual universidade pretende ingressar? -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1.5">Qual universidade pretende ingressar?</label>
+                        <div class="relative flex items-center">
+                            <i class="ph ph-buildings absolute left-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                            <input 
+                                type="text" 
+                                maxlength="50"
+                                x-model="universidade"
+                                placeholder="Ex: USP, UNICAMP, UFRJ..."
+                                class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Tipo de instituição Superior -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-2">Tipo de instituição Superior</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center gap-2 p-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl cursor-pointer hover:border-blue-500 transition-all">
+                                <input type="radio" name="tipo_superior" value="publica" x-model="tipoSuperior" class="accent-blue-600 hc:accent-yellow-400">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 hc:text-white">Pública</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl cursor-pointer hover:border-blue-500 transition-all">
+                                <input type="radio" name="tipo_superior" value="particular" x-model="tipoSuperior" class="accent-blue-600 hc:accent-yellow-400">
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 hc:text-white">Particular</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- O que você deseja alcançar? -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-2">O que você deseja alcançar?</label>
+                        <div class="space-y-2">
+                            <template x-for="option in objetiveOptions" :key="option.id">
+                                <label class="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl cursor-pointer hover:border-blue-500 transition-all">
+                                    <input 
+                                        type="radio" 
+                                        name="objetivo" 
+                                        :value="option.id" 
+                                        x-model="selectedObjetivo"
+                                        class="accent-blue-600 hc:accent-yellow-400"
+                                    >
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-200 hc:text-white" x-text="option.label"></span>
+                                </label>
+                            </template>
+
+                            <!-- Campo adicional se selecionar 'Outro' -->
+                            <div x-show="selectedObjetivo === 'outro'" x-collapse x-cloak class="pt-2">
+                                <input 
+                                    type="text" 
+                                    maxlength="150"
+                                    x-model="objetivoOutroTexto"
+                                    placeholder="Especifique (se marcou Outro)"
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensagem de erro -->
+                    <p x-show="erro" x-cloak class="text-sm text-red-600 hc:text-yellow-300" x-text="erro"></p>
+
+                    <!-- Botão de Envio -->
+                    <button 
+                        type="submit"
+                        class="w-full mt-4 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 text-white font-medium rounded-xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                    >
+                        <span>Finalizar cadastro</span>
+                        <i class="ph-bold ph-check-circle text-lg"></i>
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Lógica Alpine.js -->
+    <script>
+        // Conversão dos valores em texto usados neste formulário para os códigos
+        // numéricos que a tabela "usuario" no banco espera.
+        const SERIE_MAP = {
+            '5_ef': 1, '6_ef': 2, '7_ef': 3, '8_ef': 4, '9_ef': 5,
+            '1_em': 6, '2_em': 7, '3_em': 8,
+        };
+        const REDE_MAP = { publica: 1, particular: 2 };
+        const OBJETIVO_MAP = { enem: 1, vestibular: 2, notas: 3, estudos: 4, recuperacao: 5, concurso: 6, outro: 7 };
+
+        function academicApp() {
+            return {
+                theme: 'auto',
+                isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+                selectedObjetivo: '',
+                objetiveOptions: [
+                    { id: 'enem', label: 'Passar no ENEM' },
+                    { id: 'vestibular', label: 'Passar no vestibular' },
+                    { id: 'notas', label: 'Melhorar minhas notas' },
+                    { id: 'estudos', label: 'Organizar meus estudos' },
+                    { id: 'recuperacao', label: 'Recuperação escolar' },
+                    { id: 'concurso', label: 'Concurso' },
+                    { id: 'outro', label: 'Outro' }
+                ],
+                dataNascimento: '',
+                serie: '',
+                redeEnsino: '',
+                curso: '',
+                universidade: '',
+                tipoSuperior: '',
+                objetivoOutroTexto: '',
+                erro: '',
+
+                get isDarkClass() {
+                    return this.theme === 'dark' || (this.theme === 'auto' && this.isSystemDark) || this.theme === 'hc';
+                },
+
+                init() {
+                    // Esta tela é a etapa 2 do cadastro — precisa que nome/e-mail/senha
+                    // já tenham sido preenchidos na etapa 1 (create_account.html).
+                    if (!sessionStorage.getItem('cadastroPendente')) {
+                        window.location.href = 'create_account.html';
+                    }
+                },
+
+                async handleSubmit() {
+                    this.erro = '';
+
+                    const cadastroPendenteRaw = sessionStorage.getItem('cadastroPendente');
+                    if (!cadastroPendenteRaw) {
+                        window.location.href = 'create_account.html';
+                        return;
+                    }
+                    const cadastroPendente = JSON.parse(cadastroPendenteRaw);
+
+                    try {
+                        const resposta = await fetch('/api/cadastro', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ...cadastroPendente,
+                                dataNascimento: this.dataNascimento,
+                                serie: SERIE_MAP[this.serie],
+                                redeEnsino: REDE_MAP[this.redeEnsino],
+                                curso: this.curso,
+                                universidade: this.universidade,
+                                tipoInstituicao: REDE_MAP[this.tipoSuperior],
+                                objetivo: OBJETIVO_MAP[this.selectedObjetivo],
+                                objetivoOutro: this.selectedObjetivo === 'outro' ? this.objetivoOutroTexto : null,
+                            }),
+                        });
+
+                        const dados = await resposta.json();
+
+                        if (!resposta.ok) {
+                            this.erro = dados.erro || 'Erro ao salvar cadastro.';
+                            return;
+                        }
+
+                        sessionStorage.removeItem('cadastroPendente');
+                        sessionStorage.setItem('usuarioId', dados.usuarioId);
+                        window.location.href = "main.html";
+
+                    } catch (err) {
+                        this.erro = 'Erro de conexão com o servidor.';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

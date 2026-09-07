@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR" :class="{ 'dark': isDarkClass, 'hc': theme === 'hc' }" x-data="homeApp()">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Do sucesso - Transforme sua rotina de estudos</title>
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="stylelogin.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Configuração Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', 800: '#1e293b', 900: '#0f172a', 950: '#020617'
+                        }
+                    }
+                }
+            },
+            plugins: [
+                function({ addVariant }) {
+                    addVariant('hc', 'html.hc &');
+                }
+            ]
+        }
+    </script>
+</head>
+<body 
+    class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-200 selection:text-blue-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100 hc:bg-black hc:text-white min-h-screen flex flex-col justify-between"
+>
+    <!-- NAV BAR SUPERIOR (AZUL) -->
+    <header class="w-full bg-blue-600 dark:bg-blue-700 hc:bg-black hc:border-b-2 hc:border-white shadow-md sticky top-0 z-50 text-white">
+        <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+            
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center">
+                <img src="img/horizontallogotransline.png" alt="Rota Do Sucesso" class="h-16 w-auto object-contain">
+            </a>
+
+            <!-- Ações Direita -->
+            <div class="flex items-center gap-4">
+                <!-- Seletor Rápido de Tema -->
+                <div class="flex items-center gap-1 bg-blue-700/50 dark:bg-slate-900 hc:bg-black hc:border hc:border-white p-1 rounded-xl border border-blue-400/30 dark:border-slate-800">
+                    <button @click="theme = 'light'" :class="theme === 'light' ? 'bg-white text-blue-600 shadow-sm' : 'text-blue-100 dark:text-slate-400'" class="p-1.5 rounded-lg text-sm transition-all" title="Tema Claro">
+                        <i class="ph-bold ph-sun"></i>
+                    </button>
+                    <button @click="theme = 'dark'" :class="theme === 'dark' ? 'bg-slate-800 text-blue-400 shadow-sm' : 'text-blue-100 dark:text-slate-400'" class="p-1.5 rounded-lg text-sm transition-all" title="Tema Escuro">
+                        <i class="ph-bold ph-moon"></i>
+                    </button>
+                    <button @click="theme = 'hc'" :class="theme === 'hc' ? 'bg-white text-black font-bold' : 'text-blue-100 dark:text-slate-400'" class="p-1.5 rounded-lg text-sm transition-all" title="Alto Contraste">
+                        <i class="ph-bold ph-circle-half-tilt"></i>
+                    </button>
+                </div>
+
+                <!-- Botões de Acesso -->
+                <a href="login.html" class="hidden sm:inline-block text-sm font-semibold text-blue-100 hover:text-white hc:text-yellow-300 transition-colors">
+                    Entrar
+                </a>
+                <a href="create_account.html" class="py-2 px-4 bg-white text-blue-600 hover:bg-blue-50 dark:bg-blue-600 dark:hover:bg-blue-500 dark:text-white hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 font-medium text-sm rounded-xl shadow-sm transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                    <span>Criar conta</span>
+                    <i class="ph-bold ph-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1">
+        
+        <!-- HERO SECTION COM IMAGEM DE FUNDO -->
+        <section class="relative overflow-hidden py-16 lg:py-24 px-6 bg-cover bg-center bg-no-repeat" style="background-image: url('img/placeholder.png');">
+            
+            <!-- Máscara/Overlay para garantir boa leitura dos textos sobre a imagem -->
+            <div class="absolute inset-0 bg-slate-50/85 dark:bg-slate-950/85 hc:bg-black/90 transition-colors duration-300"></div>
+
+            <!-- Gradientes Decorativos -->
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-blue-600/15 rounded-full blur-3xl pointer-events-none hc:hidden"></div>
+            
+            <div class="max-w-6xl mx-auto text-center relative z-10">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-100/90 dark:bg-blue-950/80 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hc:bg-yellow-400 hc:text-black mb-6 backdrop-blur-sm">
+                    <i class="ph-bold ph-sparkle"></i> A plataforma de estudos definitiva
+                </span>
+                
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white hc:text-white mb-6 leading-tight max-w-4xl mx-auto">
+                    Um espaço digital silencioso para organizar sua mente e alcançar seus objetivos.
+                </h1>
+                
+                <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-300 hc:text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+                    Gerencie disciplinas, cronometre sessões de foco profundo e acompanhe sua evolução acadêmica em uma interface sem distrações.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                    <a href="login.html" class="w-full sm:w-auto py-3.5 px-8 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 text-white font-medium rounded-xl shadow-lg transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-base">
+                        <span>Comece agora gratuitamente</span>
+                        <i class="ph-bold ph-arrow-right text-lg"></i>
+                    </a>
+                </div>
+
+                <!-- SEÇÃO COM 3 IMAGENS + LEGENDA -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                    
+                    <!-- Card Imagem 1 -->
+                    <div class="bg-white/90 dark:bg-slate-900/90 hc:bg-black backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-800 hc:border-2 hc:border-white p-4 shadow-xl flex flex-col justify-between">
+                        <div class="w-full h-48 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-950 hc:bg-black mb-4">
+                            <img src="img/ph1.png" alt="Visão Geral do Painel" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white hc:text-white text-base mb-1">Visão Geral do Painel</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                                Acompanhe suas disciplinas ativas e métricas de desempenho diárias em um só lugar.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card Imagem 2 -->
+                    <div class="bg-white/90 dark:bg-slate-900/90 hc:bg-black backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-800 hc:border-2 hc:border-white p-4 shadow-xl flex flex-col justify-between">
+                        <div class="w-full h-48 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-950 hc:bg-black mb-4">
+                            <img src="img/ph2.png" alt="Modo Foco Total" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white hc:text-white text-base mb-1">Modo Foco Total</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                                Cronômetro integrado para aplicar técnicas como Pomodoro e evitar distrações.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card Imagem 3 -->
+                    <div class="bg-white/90 dark:bg-slate-900/90 hc:bg-black backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-800 hc:border-2 hc:border-white p-4 shadow-xl flex flex-col justify-between">
+                        <div class="w-full h-48 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-950 hc:bg-black mb-4">
+                            <img src="img/ph3.png" alt="Perfil Acadêmico" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 dark:text-white hc:text-white text-base mb-1">Perfil Acadêmico</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                                Informações adaptadas aos seus vestibulares e objetivos de aprendizado.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- RECURSOS / SOBRE O SITE -->
+        <section class="py-16 px-6 bg-slate-100/60 dark:bg-slate-900/40 hc:bg-black hc:border-t-2 hc:border-b-2 hc:border-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white mb-3">
+                        Tudo o que você precisa para evoluir nos estudos
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300 text-sm sm:text-base">
+                        Ferramentas pensadas para eliminar a procrastinação e otimizar o seu aprendizado diário.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <!-- Card 1 -->
+                    <div class="bg-white dark:bg-slate-900 hc:bg-black p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hc:border-2 hc:border-white shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950 hc:bg-yellow-400 hc:text-black text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl font-bold mb-6">
+                                <i class="ph-bold ph-target"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white hc:text-white mb-2">Perfil Personalizado</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                                Monte seu perfil focado nos seus maiores desafios: seja passar no ENEM, vestibulares, concursos ou organizar sua rotina escolar.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-white dark:bg-slate-900 hc:bg-black p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hc:border-2 hc:border-white shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950 hc:bg-yellow-400 hc:text-black text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl font-bold mb-6">
+                                <i class="ph-bold ph-timer"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white hc:text-white mb-2">Foco e Produtividade</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                                Cronometre sessões de estudo sem distrações e mantenha o ritmo ideal para absorver conteúdos complexos com facilidade.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-white dark:bg-slate-900 hc:bg-black p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hc:border-2 hc:border-white shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950 hc:bg-yellow-400 hc:text-black text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl font-bold mb-6">
+                                <i class="ph-bold ph-chart-line-up"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white hc:text-white mb-2">Acompanhamento</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                                Visualize seu desempenho, gerencie suas disciplinas e saiba exatamente onde direcionar sua energia para conquistar aprovações.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA FINAL -->
+        <section class="py-20 px-6">
+            <div class="max-w-4xl mx-auto bg-slate-900 dark:bg-slate-900/80 hc:bg-black hc:border-2 hc:border-white rounded-3xl p-8 sm:p-12 text-center text-white relative overflow-hidden shadow-2xl">
+                <div class="relative z-10">
+                    <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Pronto para dar o próximo passo na sua jornada?</h2>
+                    <p class="text-slate-300 hc:text-gray-300 text-base max-w-xl mx-auto mb-8">
+                        Crie sua conta em poucos segundos, defina seus objetivos e descubra uma nova forma de estudar.
+                    </p>
+                    <a href="login.html" class="inline-flex items-center gap-2 py-3.5 px-8 bg-blue-600 hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold font-medium rounded-xl transition-all hover:-translate-y-0.5">
+                        <span>Criar minha conta agora</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="w-full border-t border-slate-200 dark:border-slate-800 hc:border-white py-8 px-6 bg-white dark:bg-slate-950 hc:bg-black text-xs text-slate-500 dark:text-slate-400 hc:text-gray-400">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center">
+                <img src="img/horizontallogotransline.png" alt="Rota Do Sucesso" class="h-16 w-auto object-contain">
+            </div>
+            <span>© 2026 Rota Do Sucesso.</span>
+        </div>
+    </footer>
+
+    <!-- Lógica Alpine.js -->
+    <script>
+        function homeApp() {
+            return {
+                theme: localStorage.getItem('user_theme') || 'light',
+                isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+
+                init() {
+                    this.$watch('theme', value => localStorage.setItem('user_theme', value));
+                },
+
+                get isDarkClass() {
+                    return this.theme === 'dark';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

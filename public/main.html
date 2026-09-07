@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Do sucesso - Plataforma de Estudos</title>
+    <link rel="stylesheet" href="stylemain.css">
+    <link rel="icon" href="img/horizontallogotrans.png">
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Alpine.js para reatividade e estado -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Configuração Tailwind customizada para Alto Contraste -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', 800: '#1e293b', 900: '#0f172a', 950: '#020617'
+                        }
+                    },
+                    transitionProperty: {
+                        'height': 'height',
+                        'spacing': 'margin, padding',
+                    }
+                }
+            },
+            plugins: [
+                function({ addVariant }) {
+                    addVariant('hc', 'body.hc &');
+                }
+            ]
+        }
+    </script>
+</head>
+<body 
+    x-data="studyApp()" 
+    x-init="initApp()"
+    :class="{ 
+        'dark': isDarkClass,
+        'hc': theme === 'hc' 
+    }"
+    class="bg-slate-50 text-slate-800 dark:text-slate-100 antialiased selection:bg-blue-200 selection:text-blue-900 transition-colors duration-300 hc:bg-black hc:text-white"
+>
+    <div class="dark:bg-slate-950 min-h-screen flex transition-colors duration-300 overflow-hidden hc:bg-black">
+        
+        <!-- SIDEBAR (Desktop) -->
+        <aside class="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 hc:bg-black hc:border-white hc:border-r-2 transition-all duration-300 z-20">
+            <div class="h-20 flex items-center px-6 border-b border-slate-100 dark:border-slate-800 hc:border-white">
+                <a href="index.html" class="flex items-center">
+                <img src="img/horizontallogotransline.png" alt="Rota Do Sucesso" class="h-20 w-auto object-contain">
+            </a>
+            </div>
+            
+            <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                <template x-for="item in menuItems" :key="item.id">
+                    <button 
+                        @click="currentTab = item.id"
+                        class="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 group"
+                        :class="currentTab === item.id 
+                            ? `${accentBgBase} font-medium shadow-sm` 
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black text-slate-600 dark:text-slate-300 hc:text-white'"
+                    >
+                        <i :class="`ph ph-${item.icon} text-xl transition-transform duration-200 group-hover:scale-110`" 
+                           :class="currentTab === item.id ? 'ph-fill' : ''"></i>
+                        <span class="ml-3" x-text="item.label"></span>
+                    </button>
+                </template>
+            </nav>
+
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 hc:border-white">
+                <a href="perfil-visualizar.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black transition cursor-pointer group block">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 hc:bg-yellow-400 hc:text-black text-white flex items-center justify-center text-sm font-bold border-2 border-transparent group-hover:border-slate-300 hc:border-white flex-shrink-0" x-text="nome ? nome.charAt(0).toUpperCase() : '?'"></div>
+                    <div>
+                        <p class="text-sm font-semibold text-slate-900 dark:text-white" x-text="nome || 'Carregando...'"></p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 group-hover:text-current group-[.hc]:text-yellow-300" x-text="email"></p>
+                    </div>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+            
+            <!-- HEADER MOBILE -->
+            <header class="md:hidden h-16 bg-white/80 dark:bg-slate-900/80 hc:bg-black/90 glass-panel border-b border-slate-200 dark:border-slate-800 hc:border-white hc:border-b-2 flex items-center justify-between px-6 z-20">
+                <div class="flex items-center gap-2">
+                    <img src="img/horizontallogotrans.png" alt="Rota Do Sucesso" class="h-8 w-auto object-contain">
+                </div>
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-slate-600 dark:text-slate-300 hc:text-white">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+            </header>
+
+            <!-- SCROLLABLE AREA -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
+                
+                <!-- DASHBOARD TAB -->
+                <div x-show="currentTab === 'dashboard'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+                    
+                    <!-- Saudação -->
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500 dark:text-slate-400 hc:text-yellow-300 mb-1" x-text="currentDate"></p>
+                            <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Olá, <span x-text="nome ? nome.split(' ')[0] : 'Estudante'"></span>.</h1>
+                            <p class="text-slate-600 dark:text-slate-300 hc:text-white mt-2 flex items-center gap-2">
+                                <i class="ph-fill ph-sparkle" :class="accentText"></i>
+                                Você está a 45 minutos de completar sua meta de hoje.
+                            </p>
+                        </div>
+                        <button @click="currentTab = 'timer'" class="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5" :class="accentBg">
+                            <i class="ph-bold ph-play"></i> Iniciar Foco
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <!-- Progresso Card -->
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white hc:shadow-none flex flex-col justify-between">
+                            <div class="flex justify-between items-start mb-4">
+                                <h2 class="font-semibold text-lg text-slate-900 dark:text-white">Progresso Diário</h2>
+                                <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hc:text-white"><i class="ph ph-dots-three text-xl"></i></button>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <!-- Círculo SVG -->
+                                <div class="relative w-24 h-24 flex-shrink-0">
+                                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                        <path class="text-slate-100 dark:text-slate-800 hc:text-gray-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        <path :class="accentText" stroke-dasharray="75, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                        <span class="text-xl font-bold text-slate-900 dark:text-white">75%</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-3xl font-bold mb-1 text-slate-900 dark:text-white">3h 15m</p>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-yellow-300 mb-2">de 4h planejadas</p>
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-medium px-2 py-1 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 hc:bg-transparent hc:border hc:border-white hc:text-white rounded-md flex items-center gap-1">
+                                            <i class="ph-fill ph-fire hc:text-yellow-400"></i> 12 dias
+                                        </span>
+                                        <span class="text-xs font-medium px-2 py-1 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hc:bg-transparent hc:border hc:border-white hc:text-white rounded-md">
+                                            4 sessões
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agenda Card -->
+                        <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="font-semibold text-lg text-slate-900 dark:text-white">Agenda de Hoje</h2>
+                                <button class="text-sm font-medium" :class="accentText">Ver tudo</button>
+                            </div>
+                            <div class="space-y-3">
+                                <template x-for="(item, index) in schedule" :key="index">
+                                    <div class="flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 hc:hover:bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-slate-700 hc:border-b hc:border-dashed hc:border-gray-600 hc:rounded-none hc:hover:border-white group">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 text-center">
+                                                <p class="text-sm font-bold text-slate-900 dark:text-white" x-text="item.time"></p>
+                                                <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-yellow-300" x-text="item.duration"></p>
+                                            </div>
+                                            <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl" :class="item.colorClass">
+                                                <i :class="`ph-fill ph-${item.icon}`"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-semibold text-slate-900 dark:text-white" x-text="item.subject"></p>
+                                                <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300" x-text="item.topic"></p>
+                                            </div>
+                                        </div>
+                                        <button x-show="item.status === 'pending'" @click="selectedSubject = item.subject; currentTab = 'timer'" class="opacity-0 group-hover:opacity-100 transition-opacity px-4 py-1.5 rounded-lg text-sm shadow-sm" :class="accentBg">
+                                            Iniciar
+                                        </button>
+                                        <span x-show="item.status === 'done'" class="text-green-500 hc:text-white flex items-center gap-1 text-sm font-medium pr-2">
+                                            <i class="ph-fill ph-check-circle text-lg hc:text-yellow-400"></i> Feito
+                                        </span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matérias -->
+                    <h2 class="font-semibold text-lg mb-4 text-slate-900 dark:text-white">Suas Matérias</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                        <template x-for="subject in subjects" :key="subject.name">
+                            <div @click="selectedSubject = subject.name; currentTab = 'timer'" class="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white hc:shadow-none hover:-translate-y-1 transition-all duration-300 cursor-pointer group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-transform group-hover:scale-110 duration-300" :class="subject.colorClass">
+                                        <i :class="`ph-fill ph-${subject.icon}`"></i>
+                                    </div>
+                                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400 hc:text-yellow-300" x-text="subject.lastStudied"></span>
+                                </div>
+                                <h3 class="font-bold text-lg mb-1 text-slate-900 dark:text-white" x-text="subject.name"></h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 mb-4" x-text="`${subject.hours}h estudadas • ${subject.contentCount} tópicos`"></p>
+                                
+                                <div class="w-full bg-slate-100 dark:bg-slate-800 hc:bg-gray-800 rounded-full h-2 mb-1 overflow-hidden hc:border hc:border-white">
+                                    <div class="h-full rounded-full transition-all duration-1000 ease-out" :class="accentFill" :style="`width: ${subject.progress}%`"></div>
+                                </div>
+                                <p class="text-right text-xs font-bold" :class="accentText" x-text="`${subject.progress}% concluído`"></p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- TIMER TAB -->
+                <div x-show="currentTab === 'timer'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="h-full flex flex-col items-center justify-center" x-cloak>
+
+                    <!-- Display -->
+                    <div class="relative flex items-center justify-center mb-8">
+                        <div x-show="isTimerRunning" class="absolute inset-0 rounded-full animate-ping opacity-20 hc:opacity-100 hc:border-2 hc:border-dashed hc:border-yellow-400 hc:bg-transparent" :class="theme === 'hc' ? '' : accentBg" style="animation-duration: 3s;"></div>
+                        
+                        <h1 class="text-8xl md:text-9xl font-bold tracking-tighter tabular-nums text-slate-800 dark:text-white hc:text-white" x-text="formattedTime"></h1>
+                    </div>
+
+                    <!-- Seletor / Indicador Dinâmico da Matéria -->
+                    <div class="text-lg font-medium text-slate-500 dark:text-slate-400 hc:text-yellow-400 mb-10 flex items-center gap-2 bg-white/50 dark:bg-slate-900/50 hc:bg-black px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 hc:border-white shadow-sm">
+                        <i class="ph-fill ph-target" :class="accentText"></i>
+                        <span>Focando em:</span>
+                        <select x-model="selectedSubject" class="bg-transparent font-bold text-slate-800 dark:text-white hc:text-yellow-400 cursor-pointer focus:outline-none">
+                            <template x-for="subj in subjects" :key="subj.name">
+                                <option :value="subj.name" x-text="subj.name" class="bg-white dark:bg-slate-900 text-slate-800 dark:text-white hc:bg-black hc:text-white"></option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex items-center gap-6">
+                        <button @click="resetTimer" title="Reiniciar" class="w-14 h-14 rounded-2xl flex items-center justify-center text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white hc:text-white hc:hover:bg-white hc:hover:text-black transition-colors shadow-sm">
+                            <i class="ph-bold ph-arrow-counter-clockwise text-2xl"></i>
+                        </button>
+                        
+                        <button @click="toggleTimer" :title="isTimerRunning ? 'Pausar' : 'Iniciar'" class="w-24 h-24 rounded-3xl flex items-center justify-center shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300" :class="accentBg">
+                            <i class="text-4xl" :class="isTimerRunning ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
+                        </button>
+                        
+                        <button @click="skipTimer" title="Avançar 5 minutos" class="w-14 h-14 rounded-2xl flex items-center justify-center text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white hc:text-white hc:hover:bg-white hc:hover:text-black transition-colors shadow-sm">
+                            <i class="ph-bold ph-skip-forward text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TASKS TAB -->
+                <div x-show="currentTab === 'tasks'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-4xl mx-auto" x-cloak>
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight mb-2 text-slate-900 dark:text-white hc:text-white">Tarefas</h1>
+                            <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Gerencie seus estudos e entregas.</p>
+                        </div>
+                        <button @click="showTaskModal = true" class="px-5 py-2.5 rounded-xl font-medium shadow-sm flex items-center gap-2 hover:-translate-y-0.5 transition-transform" :class="accentBg">
+                            <i class="ph-bold ph-plus-circle text-xl"></i> Nova Tarefa
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-200 dark:border-slate-800 hc:border-white flex gap-4 text-sm font-medium overflow-x-auto">
+                            <button @click="taskFilter = 'today'" class="px-4 py-2 rounded-lg transition-colors" :class="taskFilter === 'today' ? 'bg-slate-100 dark:bg-slate-800 hc:bg-white hc:text-black text-slate-800 dark:text-white font-semibold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hc:text-white'">
+                                Hoje (<span x-text="tasks.filter(t => !t.done && t.type === 'today').length"></span>)
+                            </button>
+                            <button @click="taskFilter = 'upcoming'" class="px-4 py-2 rounded-lg transition-colors" :class="taskFilter === 'upcoming' ? 'bg-slate-100 dark:bg-slate-800 hc:bg-white hc:text-black text-slate-800 dark:text-white font-semibold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hc:text-white'">
+                                Próximas (<span x-text="tasks.filter(t => !t.done && t.type === 'upcoming').length"></span>)
+                            </button>
+                            <button @click="taskFilter = 'completed'" class="px-4 py-2 rounded-lg transition-colors" :class="taskFilter === 'completed' ? 'bg-slate-100 dark:bg-slate-800 hc:bg-white hc:text-black text-slate-800 dark:text-white font-semibold' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hc:text-white'">
+                                Concluídas (<span x-text="tasks.filter(t => t.done).length"></span>)
+                            </button>
+                        </div>
+                        
+                        <div class="divide-y divide-slate-100 dark:divide-slate-800/50 hc:divide-white hc:divide-y-2">
+                            <template x-for="task in filteredTasks" :key="task.id">
+                                <div class="p-4 flex items-start gap-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 hc:hover:bg-gray-900 transition-colors group">
+                                    <button @click="task.done = !task.done" class="mt-0.5 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors flex-shrink-0" :class="task.done ? `${accentBg} border-transparent hc:border-yellow-400 text-white hc:text-black` : 'border-slate-300 dark:border-slate-600 hc:border-white hover:border-slate-400 dark:hover:border-slate-500 hc:hover:border-yellow-400 text-transparent'">
+                                        <i class="ph-bold ph-check text-sm"></i>
+                                    </button>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-slate-800 dark:text-slate-200 hc:text-white transition-all" :class="task.done ? 'line-through text-slate-400 dark:text-slate-500 hc:text-gray-500' : ''" x-text="task.title"></p>
+                                        <div class="flex items-center gap-3 mt-2 text-xs font-medium">
+                                            <span class="px-2 py-1 rounded-md" :class="task.subjectClass" x-text="task.subject"></span>
+                                            <span class="flex items-center gap-1 text-slate-500 dark:text-slate-400 hc:text-yellow-300">
+                                                <i class="ph-bold ph-clock"></i> <span x-text="task.deadline"></span>
+                                            </span>
+                                            <span x-show="task.priority === 'high'" class="text-red-500 hc:text-white flex items-center gap-1 hc:border hc:border-red-500 hc:px-2 hc:py-1 hc:rounded-md">
+                                                <i class="ph-fill ph-flag hc:text-red-500"></i> Alta
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button @click="removeTask(task.id)" class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-500 dark:hover:text-red-400 hc:text-white p-1" title="Excluir Tarefa">
+                                        <i class="ph-bold ph-trash text-lg"></i>
+                                    </button>
+                                </div>
+                            </template>
+                            
+                            <div x-show="filteredTasks.length === 0" class="p-8 text-center text-slate-500 dark:text-slate-400 hc:text-white">
+                                Nenhuma tarefa encontrada nesta seção.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODAL DE NOVA TAREFA -->
+                <div x-show="showTaskModal" x-transition.opacity class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" x-cloak>
+                    <div @click.away="showTaskModal = false" class="bg-white dark:bg-slate-900 hc:bg-black hc:border-2 hc:border-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white hc:text-white">Criar Nova Tarefa</h3>
+                            <button @click="showTaskModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hc:text-white">
+                                <i class="ph-bold ph-x text-xl"></i>
+                            </button>
+                        </div>
+                        
+                        <form @submit.prevent="addTask()" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Título da Tarefa</label>
+                                <input type="text" x-model="newTask.title" required placeholder="Ex: Resolver lista de exercícios" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Matéria</label>
+                                    <select x-model="newTask.subject" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                                        <template x-for="subj in subjects" :key="subj.name">
+                                            <option :value="subj.name" x-text="subj.name"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Prioridade</label>
+                                    <select x-model="newTask.priority" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                                        <option value="normal">Normal</option>
+                                        <option value="high">Alta</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Prazo Exibido</label>
+                                    <input type="text" x-model="newTask.deadline" required placeholder="Ex: Hoje, 18:00 ou Amanhã" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Aba</label>
+                                    <select x-model="newTask.type" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                                        <option value="today">Hoje</option>
+                                        <option value="upcoming">Próximas</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-2">
+                                <button type="button" @click="showTaskModal = false" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hc:text-white">Cancelar</button>
+                                <button type="submit" class="px-5 py-2 rounded-xl font-medium shadow-sm" :class="accentBg">Salvar Tarefa</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- CALENDÁRIO TAB -->
+                <div x-show="currentTab === 'calendar'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-6xl mx-auto space-y-6" x-cloak>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Calendário de Estudos</h1>
+                            <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Organize suas provas, entregas e eventos importantes.</p>
+                        </div>
+                        <button @click="showEventModal = true" class="px-5 py-2.5 rounded-xl font-medium shadow-sm flex items-center gap-2 hover:-translate-y-0.5 transition-transform" :class="accentBg">
+                            <i class="ph-bold ph-plus text-xl"></i> Adicionar Evento
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white" x-text="`${currentMonthName} ${currentYear}`"></h2>
+                            <div class="flex gap-2">
+                                <button @click="previousMonth()" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 hc:border-white text-slate-700 dark:text-slate-200 hc:text-white"><i class="ph-bold ph-caret-left"></i></button>
+                                <button @click="nextMonth()" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 hc:border-white text-slate-700 dark:text-slate-200 hc:text-white"><i class="ph-bold ph-caret-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Grid Dias da Semana -->
+                        <div class="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-400 mb-2">
+                            <div>DOM</div><div>SEG</div><div>TER</div><div>QUA</div><div>QUI</div><div>SEX</div><div>SÁB</div>
+                        </div>
+
+                        <!-- Dias -->
+                        <div class="grid grid-cols-7 gap-2">
+                            <template x-for="(day, index) in calendarDays" :key="index">
+                                <div class="min-h-[90px] p-2 rounded-xl border border-slate-100 dark:border-slate-800/60 hc:border-gray-800 flex flex-col justify-between" 
+                                     :class="{
+                                         'opacity-30 bg-slate-50/20 dark:bg-slate-900/20': !day.isCurrentMonth,
+                                         'bg-slate-50/50 dark:bg-slate-800/30 hc:border-white': day.isCurrent && day.isCurrentMonth
+                                     }">
+                                    <span class="text-sm font-semibold" :class="day.isCurrent && day.isCurrentMonth ? accentText : 'text-slate-600 dark:text-slate-400 hc:text-white'" x-text="day.day"></span>
+                                    <div class="space-y-1">
+                                        <template x-for="event in day.events" :key="event.title">
+                                            <div class="text-[10px] p-1 rounded font-medium truncate" :class="event.color" x-text="event.title"></div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODAL DE NOVO EVENTO -->
+                <div x-show="showEventModal" x-transition.opacity class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" x-cloak>
+                    <div @click.away="showEventModal = false" class="bg-white dark:bg-slate-900 hc:bg-black hc:border-2 hc:border-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white hc:text-white">Adicionar Novo Evento</h3>
+                            <button @click="showEventModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hc:text-white">
+                                <i class="ph-bold ph-x text-xl"></i>
+                            </button>
+                        </div>
+                        
+                        <form @submit.prevent="addEvent()" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Título do Evento</label>
+                                <input type="text" x-model="newEvent.title" required placeholder="Ex: Prova de História" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Data</label>
+                                <input type="date" x-model="newEvent.date" required class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Cor da Categoria</label>
+                                <select x-model="newEvent.color" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                                    <option value="bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">Azul (Trabalhos)</option>
+                                    <option value="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">Vermelho (Provas)</option>
+                                    <option value="bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Amarelo (Simulados)</option>
+                                    <option value="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">Verde (Aulas / Lembretes)</option>
+                                </select>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-2">
+                                <button type="button" @click="showEventModal = false" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hc:text-white">Cancelar</button>
+                                <button type="submit" class="px-5 py-2 rounded-xl font-medium shadow-sm" :class="accentBg">Salvar Evento</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- MATÉRIAS TAB -->
+                <div x-show="currentTab === 'subjects'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-6xl mx-auto space-y-6" x-cloak>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Gerenciar Matérias</h1>
+                            <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Acompanhe seu progresso detalhado por disciplina.</p>
+                        </div>
+                        <button @click="showSubjectModal = true" class="px-5 py-2.5 rounded-xl font-medium shadow-sm flex items-center gap-2 hover:-translate-y-0.5 transition-transform" :class="accentBg">
+                            <i class="ph-bold ph-plus text-xl"></i> Nova Matéria
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <template x-for="subject in subjects" :key="subject.name">
+                            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm space-y-4">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" :class="subject.colorClass">
+                                            <i :class="`ph-fill ph-${subject.icon}`"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-bold text-xl text-slate-900 dark:text-white" x-text="subject.name"></h3>
+                                            <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-yellow-300" x-text="`${subject.contentCount} tópicos no programa`"></p>
+                                        </div>
+                                    </div>
+                                    <button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hc:text-white"><i class="ph-bold ph-dots-three-vertical text-xl"></i></button>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-sm font-medium">
+                                        <span class="text-slate-600 dark:text-slate-400">Progresso Geral</span>
+                                        <span :class="accentText" x-text="`${subject.progress}%`"></span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden hc:border hc:border-white">
+                                        <div class="h-full rounded-full transition-all duration-500" :class="accentFill" :style="`width: ${subject.progress}%`"></div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-2 border-t border-slate-100 dark:border-slate-800 hc:border-gray-800 flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 hc:text-white">
+                                    <span>Total: <strong class="text-slate-800 dark:text-slate-200 hc:text-yellow-300" x-text="`${subject.hours}h`"></strong></span>
+                                    <span>Última aula: <strong class="text-slate-800 dark:text-slate-200 hc:text-yellow-300" x-text="subject.lastStudied"></strong></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- MODAL DE NOVA MATÉRIA -->
+                <div x-show="showSubjectModal" x-transition.opacity class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" x-cloak>
+                    <div @click.away="showSubjectModal = false" class="bg-white dark:bg-slate-900 hc:bg-black hc:border-2 hc:border-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white hc:text-white">Criar Nova Matéria</h3>
+                            <button @click="showSubjectModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hc:text-white">
+                                <i class="ph-bold ph-x text-xl"></i>
+                            </button>
+                        </div>
+                        
+                        <form @submit.prevent="addSubject()" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Nome da Matéria</label>
+                                <input type="text" x-model="newSubject.name" required placeholder="Ex: Biologia" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Ícone</label>
+                                    <select x-model="newSubject.icon" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                                        <option value="books">Livros</option>
+                                        <option value="atom">Átomo (Ciências)</option>
+                                        <option value="function">Função (Matemática)</option>
+                                        <option value="bank">História</option>
+                                        <option value="code">Geografia</option>
+                                        <option value="flask">Química / Lab</option>
+                                        <option value="pencil">Redação / Línguas</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Quantidade de Tópicos</label>
+                                    <input type="number" x-model.number="newSubject.contentCount" required placeholder="Ex: 15" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Cor do Card</label>
+                                <select x-model="newSubject.colorClass" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white focus:outline-none">
+                                    <option value="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white">Azul</option>
+                                    <option value="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white">Roxo</option>
+                                    <option value="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white">Amarelo</option>
+                                    <option value="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white">Verde</option>
+                                    <option value="bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white">Vermelho</option>
+                                </select>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-2">
+                                <button type="button" @click="showSubjectModal = false" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hc:text-white">Cancelar</button>
+                                <button type="submit" class="px-5 py-2 rounded-xl font-medium shadow-sm" :class="accentBg">Salvar Matéria</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ESTATÍSTICAS TAB -->
+                <div x-show="currentTab === 'stats'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-6xl mx-auto space-y-6" x-cloak>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Estatísticas & Desempenho</h1>
+                        <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Análise detalhada do seu tempo de estudo e foco.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <p class="text-sm font-medium text-slate-500 dark:text-slate-400 hc:text-yellow-300">Tempo Total de Foco</p>
+                            <h2 class="text-4xl font-extrabold mt-2 text-slate-900 dark:text-white">185h 30m</h2>
+                            <p class="text-xs text-green-500 font-semibold mt-2 flex items-center gap-1"><i class="ph-bold ph-trend-up"></i> +12% essa semana</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <p class="text-sm font-medium text-slate-500 dark:text-slate-400 hc:text-yellow-300">Sessões Concluídas</p>
+                            <h2 class="text-4xl font-extrabold mt-2 text-slate-900 dark:text-white">142</h2>
+                            <p class="text-xs text-green-500 font-semibold mt-2 flex items-center gap-1"><i class="ph-bold ph-check"></i> 98% da meta atingida</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <p class="text-sm font-medium text-slate-500 dark:text-slate-400 hc:text-yellow-300">Sequência Atual</p>
+                            <h2 class="text-4xl font-extrabold mt-2 text-slate-900 dark:text-white">12 Dias</h2>
+                            <p class="text-xs text-orange-500 font-semibold mt-2 flex items-center gap-1"><i class="ph-fill ph-fire"></i> Maior marca: 18 dias</p>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico Visual Simulado -->
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                        <h3 class="text-lg font-bold mb-6 text-slate-900 dark:text-white">Horas Estudadas esta Semana</h3>
+                        <div class="h-48 flex items-end justify-between gap-3 pt-6 px-4 border-b border-slate-100 dark:border-slate-800 hc:border-gray-800">
+                            <template x-for="bar in weeklyStats" :key="bar.day">
+                                <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
+                                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" x-text="`${bar.hours}h`"></span>
+                                    <div class="w-full rounded-t-lg transition-all duration-500" :class="accentFill" :style="`height: ${(bar.hours / 6) * 100}%`"></div>
+                                    <span class="text-xs font-medium text-slate-600 dark:text-slate-400 hc:text-white" x-text="bar.day"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ASSISTENTE IA TAB -->
+                <div x-show="currentTab === 'assistente'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-5xl mx-auto space-y-6" x-cloak>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Assistente IA</h1>
+                            <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Um cronograma de estudos montado pela IA com base no seu perfil e nas suas preferências.</p>
+                        </div>
+                        <button
+                            @click="gerarCronogramaIA()"
+                            :disabled="iaCarregando"
+                            class="px-5 py-2.5 rounded-xl font-medium shadow-sm flex items-center gap-2 hover:-translate-y-0.5 transition-transform disabled:opacity-60 disabled:hover:translate-y-0"
+                            :class="accentBg"
+                        >
+                            <i class="ph-bold text-xl" :class="iaCarregando ? 'ph-circle-notch animate-spin' : 'ph-sparkle'"></i>
+                            <span x-text="iaCarregando ? 'Gerando...' : (planoIA ? 'Gerar novamente' : 'Gerar cronograma com IA')"></span>
+                        </button>
+                    </div>
+
+                    <!-- Mensagem de erro -->
+                    <div x-show="iaErro" x-cloak class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 hc:bg-black hc:border-2 hc:border-white text-red-700 dark:text-red-300 hc:text-white rounded-2xl p-4 text-sm flex items-start gap-2">
+                        <i class="ph-bold ph-warning-circle text-lg mt-0.5"></i>
+                        <span x-text="iaErro"></span>
+                    </div>
+
+                    <!-- Estado vazio -->
+                    <div x-show="!planoIA && !iaCarregando && !iaErro" x-cloak class="bg-white dark:bg-slate-900 rounded-2xl p-10 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm text-center">
+                        <i class="ph-fill ph-sparkle text-4xl mb-3" :class="accentText"></i>
+                        <h3 class="font-semibold text-lg text-slate-900 dark:text-white mb-1">Nenhum cronograma gerado ainda</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-yellow-300 max-w-md mx-auto">
+                            Clique em "Gerar cronograma com IA" para montar uma proposta de estudos com base no seu objetivo e nas suas preferências salvas no Cronograma Personalizado.
+                        </p>
+                    </div>
+
+                    <!-- Data da última geração -->
+                    <p x-show="planoIA && geradoEm" x-cloak class="text-xs text-slate-400 dark:text-slate-500 hc:text-yellow-300">
+                        Última geração: <span x-text="geradoEmFormatado"></span>
+                    </p>
+
+                    <!-- Resultado: grade por dia -->
+                    <div x-show="planoIA" x-cloak class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <template x-for="dia in diasSemanaOrdem" :key="dia">
+                            <div x-show="planoIA && planoIA[dia]" class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                                <h3 class="font-bold text-lg text-slate-900 dark:text-white mb-1" x-text="dia"></h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-yellow-300 mb-4" x-text="planoIA && planoIA[dia] ? planoIA[dia].resumo : ''"></p>
+
+                                <div class="space-y-2">
+                                    <template x-for="(item, idx) in (planoIA && planoIA[dia] ? planoIA[dia].rotina : [])" :key="idx">
+                                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 hc:bg-transparent hc:border hc:border-dashed hc:border-gray-600">
+                                            <span class="text-sm font-bold w-14 flex-shrink-0" :class="accentText" x-text="item.horario"></span>
+                                            <span class="text-sm text-slate-700 dark:text-slate-200 hc:text-white" x-text="item.atividade"></span>
+                                        </div>
+                                    </template>
+                                    <p x-show="!(planoIA && planoIA[dia] && planoIA[dia].rotina && planoIA[dia].rotina.length)" class="text-xs text-slate-400 dark:text-slate-500 hc:text-gray-400 italic">
+                                        Dia de descanso.
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- CONFIGURAÇÕES TAB -->
+                <div x-show="currentTab === 'settings'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-3xl mx-auto space-y-6" x-cloak>
+                    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Personalização e Ajustes</h1>
+                    
+                    <div class="space-y-6">
+                        <!-- Tema -->
+                        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+                                <i class="ph-fill ph-moon-stars" :class="accentText"></i> Aparência (Contraste e Tema)
+                            </h2>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <button @click="theme = 'light'" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'light' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
+                                    <i class="ph-bold ph-sun text-3xl"></i>
+                                    <span class="font-medium">Claro</span>
+                                </button>
+                                <button @click="theme = 'dark'" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'dark' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
+                                    <i class="ph-bold ph-moon text-3xl"></i>
+                                    <span class="font-medium">Escuro</span>
+                                </button>
+                                <button @click="theme = 'auto'" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'auto' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
+                                    <i class="ph-bold ph-desktop text-3xl"></i>
+                                    <span class="font-medium">Sistema</span>
+                                </button>
+                                <button @click="theme = 'hc'" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'hc' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
+                                    <i class="ph-bold ph-circle-half-tilt text-3xl"></i>
+                                    <span class="font-medium">Alto Contraste</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Opções Adicionadas de Configuração -->
+                        <!-- Cor de Destaque -->
+                        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+                                <i class="ph-fill ph-palette" :class="accentText"></i> Cor do Sistema
+                            </h2>
+                            <div class="flex gap-4">
+                                <template x-for="c in colors" :key="c.id">
+                                    <button @click="accentColor = c.id" class="w-10 h-10 rounded-full border-4 transition-transform hover:scale-110 flex items-center justify-center" :class="[c.bg, accentColor === c.id ? 'border-slate-400 dark:border-white scale-110' : 'border-transparent']"></button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Tempos do Pomodoro -->
+                        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm space-y-4">
+                            <h2 class="text-lg font-semibold flex items-center gap-2 text-slate-900 dark:text-white">
+                                <i class="ph-fill ph-timer" :class="accentText"></i> Duração do Timer (Minutos)
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Pomodoro</label>
+                                    <input type="number" x-model.number="pomodoroTime" @change="if(!isTimerRunning) timeLeft = pomodoroTime * 60" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Pausa Curta</label>
+                                    <input type="number" value="5" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Pausa Longa</label>
+                                    <input type="number" value="15" class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white hc:bg-black hc:border-white">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notificações -->
+                        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm space-y-4">
+                            <h2 class="text-lg font-semibold flex items-center gap-2 text-slate-900 dark:text-white">
+                                <i class="ph-fill ph-bell" :class="accentText"></i> Notificações e Sons
+                            </h2>
+                            <div class="space-y-3">
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300 hc:text-white">Som ao finalizar timer</span>
+                                    <input type="checkbox" checked class="w-5 h-5 accent-blue-600 rounded">
+                                </label>
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300 hc:text-white">Lembretes diários de estudos</span>
+                                    <input type="checkbox" checked class="w-5 h-5 accent-blue-600 rounded">
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Aplicação Lógica Alpine.js -->
+     <script>
+    function studyApp() {
+    return {
+        currentTab: 'dashboard',
+        mobileMenuOpen: false,
+        usuarioId: null,
+        nome: '',
+        email: '',
+        theme: localStorage.getItem('theme') || 'light',
+        isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+        accentColor: localStorage.getItem('accentColor') || 'blue', 
+        selectedSubject: 'Matemática',
+        pomodoroTime: 25,
+
+        // Propriedades do Assistente IA
+        planoIA: null,
+        iaCarregando: false,
+        iaErro: '',
+        geradoEm: null,
+        diasSemanaOrdem: ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'],
+
+        // Propriedades das Tarefas
+        taskFilter: 'today',
+        showTaskModal: false,
+        newTask: {
+            title: '',
+            subject: 'Matemática',
+            priority: 'normal',
+            deadline: '',
+            type: 'today'
+        },
+
+        // Propriedades do Modal de Matéria
+        showSubjectModal: false,
+        newSubject: {
+            name: '',
+            icon: 'books',
+            contentCount: 0,
+            colorClass: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white'
+        },
+
+        // Propriedades do Calendário
+        currentYear: 2026,
+        currentMonth: 8, // Setembro (0 = Janeiro, 8 = Setembro)
+        monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+        showEventModal: false,
+        newEvent: {
+            title: '',
+            date: '',
+            color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+        },
+        
+        // Eventos cadastrados no sistema
+        eventsList: [
+            { year: 2026, month: 8, day: 2, title: 'Prova de Física', color: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' },
+            { year: 2026, month: 8, day: 4, title: 'Entrega Trab.', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' },
+            { year: 2026, month: 8, day: 10, title: 'Simulado', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' }
+        ],
+        
+        colors: [
+            { id: 'blue', bg: 'bg-blue-600' },
+            { id: 'indigo', bg: 'bg-indigo-600' },
+            { id: 'sky', bg: 'bg-sky-500' },
+            { id: 'cyan', bg: 'bg-cyan-600' },
+        ],
+
+        get isDarkClass() {
+            return this.theme === 'dark' || (this.theme === 'auto' && this.isSystemDark) || this.theme === 'hc';
+        },
+
+        get accentBg() { 
+            if (this.theme === 'hc') return 'bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-2 border-yellow-400';
+            return `bg-${this.accentColor}-600 hover:bg-${this.accentColor}-700 text-white border-2 border-transparent`; 
+        },
+        get accentBgBase() { 
+            if (this.theme === 'hc') return 'bg-black border-2 border-yellow-400 text-yellow-400 font-bold';
+            return `bg-${this.accentColor}-50 dark:bg-${this.accentColor}-900/30 text-${this.accentColor}-600 dark:text-${this.accentColor}-400 border-2 border-${this.accentColor}-200 dark:border-${this.accentColor}-800`; 
+        },
+        get accentText() { 
+            if (this.theme === 'hc') return 'text-yellow-400';
+            return `text-${this.accentColor}-600 dark:text-${this.accentColor}-400`; 
+        },
+        get accentFill() {
+            if (this.theme === 'hc') return 'bg-yellow-400';
+            return `bg-${this.accentColor}-600`;
+        },
+
+        get currentMonthName() {
+            return this.monthNames[this.currentMonth];
+        },
+
+        get geradoEmFormatado() {
+            if (!this.geradoEm) return '';
+            try {
+                return new Date(this.geradoEm).toLocaleString('pt-BR');
+            } catch (e) {
+                return '';
+            }
+        },
+
+        get filteredTasks() {
+            if (this.taskFilter === 'completed') {
+                return this.tasks.filter(t => t.done);
+            }
+            if (this.taskFilter === 'today') {
+                return this.tasks.filter(t => !t.done && t.type === 'today');
+            }
+            if (this.taskFilter === 'upcoming') {
+                return this.tasks.filter(t => !t.done && t.type === 'upcoming');
+            }
+            return this.tasks;
+        },
+
+        getSubjectClass(subjectName) {
+            const colorsMap = {
+                'Matemática': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                'Física': 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+                'História': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                'Geografia': 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+            };
+            return colorsMap[subjectName] || 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
+        },
+
+        addTask() {
+            if (!this.newTask.title) return;
+            
+            this.tasks.push({
+                id: Date.now(),
+                title: this.newTask.title,
+                subject: this.newTask.subject,
+                subjectClass: this.getSubjectClass(this.newTask.subject),
+                deadline: this.newTask.deadline,
+                priority: this.newTask.priority,
+                type: this.newTask.type,
+                done: false
+            });
+
+            this.newTask.title = '';
+            this.newTask.deadline = '';
+            this.showTaskModal = false;
+        },
+
+        addSubject() {
+            if (!this.newSubject.name) return;
+
+            this.subjects.push({
+                name: this.newSubject.name,
+                icon: this.newSubject.icon,
+                hours: 0,
+                contentCount: this.newSubject.contentCount || 0,
+                progress: 0,
+                lastStudied: 'Nunca',
+                colorClass: this.newSubject.colorClass
+            });
+
+            this.newSubject.name = '';
+            this.newSubject.contentCount = 0;
+            this.showSubjectModal = false;
+        },
+
+        addEvent() {
+            if (!this.newEvent.title || !this.newEvent.date) return;
+
+            const [year, month, day] = this.newEvent.date.split('-').map(Number);
+
+            this.eventsList.push({
+                year: year,
+                month: month - 1,
+                day: day,
+                title: this.newEvent.title,
+                color: this.newEvent.color
+            });
+
+            this.newEvent.title = '';
+            this.newEvent.date = '';
+            this.showEventModal = false;
+        },
+
+        removeTask(id) {
+            this.tasks = this.tasks.filter(t => t.id !== id);
+        },
+
+        get calendarDays() {
+            const days = [];
+            const firstDayOfMonth = new Date(this.currentYear, this.currentMonth, 1).getDay();
+            const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+            const daysInPrevMonth = new Date(this.currentYear, this.currentMonth, 0).getDate();
+
+            const today = new Date();
+
+            // Preencher dias do mês anterior
+            for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+                days.push({
+                    day: daysInPrevMonth - i,
+                    isCurrentMonth: false,
+                    isCurrent: false,
+                    events: []
+                });
+            }
+
+            // Preencher dias do mês atual
+            for (let d = 1; d <= daysInMonth; d++) {
+                const isToday = today.getDate() === d && today.getMonth() === this.currentMonth && today.getFullYear() === this.currentYear;
+                const dayEvents = this.eventsList.filter(e => e.year === this.currentYear && e.month === this.currentMonth && e.day === d);
+
+                days.push({
+                    day: d,
+                    isCurrentMonth: true,
+                    isCurrent: isToday,
+                    events: dayEvents
+                });
+            }
+
+            // Preencher dias do próximo mês para fechar a grade
+            const totalGridCells = Math.ceil(days.length / 7) * 7;
+            const nextDays = totalGridCells - days.length;
+            for (let n = 1; n <= nextDays; n++) {
+                days.push({
+                    day: n,
+                    isCurrentMonth: false,
+                    isCurrent: false,
+                    events: []
+                });
+            }
+
+            return days;
+        },
+
+        previousMonth() {
+            if (this.currentMonth === 0) {
+                this.currentMonth = 11;
+                this.currentYear--;
+            } else {
+                this.currentMonth--;
+            }
+        },
+
+        nextMonth() {
+            if (this.currentMonth === 11) {
+                this.currentMonth = 0;
+                this.currentYear++;
+            } else {
+                this.currentMonth++;
+            }
+        },
+
+        timeLeft: 25 * 60,
+        isTimerRunning: false,
+        timerInterval: null,
+
+        initApp() {
+            // Exige login — sem usuarioId salvo, volta para a tela de entrada.
+            const usuarioId = sessionStorage.getItem('usuarioId');
+            if (!usuarioId) {
+                window.location.href = 'login.html';
+                return;
+            }
+            this.usuarioId = usuarioId;
+            this.carregarUsuario();
+            this.carregarSugestaoIA();
+
+            this.timeLeft = this.pomodoroTime * 60;
+            
+            // Monitora e salva automaticamente as preferências quando alteradas
+            this.$watch('theme', value => localStorage.setItem('theme', value));
+            this.$watch('accentColor', value => localStorage.setItem('accentColor', value));
+        },
+
+        async carregarUsuario() {
+            try {
+                const resposta = await fetch(`/api/perfil/${this.usuarioId}`);
+                if (!resposta.ok) {
+                    if (resposta.status === 404) {
+                        sessionStorage.removeItem('usuarioId');
+                        window.location.href = 'login.html';
+                    }
+                    return;
+                }
+                const dados = await resposta.json();
+                this.nome = dados.nome;
+                this.email = dados.email;
+            } catch (err) {
+                // Se a busca falhar, os textos de fallback ("Estudante", "Carregando...") ficam no lugar.
+            }
+        },
+
+        async carregarSugestaoIA() {
+            try {
+                const resposta = await fetch(`/api/assistente-ia/${this.usuarioId}`);
+                if (!resposta.ok) {
+                    // 404 = ainda não gerou nenhuma vez; não é um erro a mostrar.
+                    return;
+                }
+                const dados = await resposta.json();
+                this.planoIA = dados.plano;
+                this.geradoEm = dados.geradoEm;
+            } catch (err) {
+                // Falha silenciosa aqui: a tela de Assistente IA mostra o estado vazio.
+            }
+        },
+
+        async gerarCronogramaIA() {
+            this.iaErro = '';
+            this.iaCarregando = true;
+
+            try {
+                const resposta = await fetch(`/api/assistente-ia/${this.usuarioId}`, {
+                    method: 'POST',
+                });
+                const dados = await resposta.json();
+
+                if (!resposta.ok) {
+                    this.iaErro = dados.erro || 'Não foi possível gerar o cronograma.';
+                    this.iaCarregando = false;
+                    return;
+                }
+
+                this.planoIA = dados.plano;
+                this.geradoEm = new Date().toISOString();
+                this.iaCarregando = false;
+            } catch (err) {
+                this.iaErro = 'Erro de conexão com o servidor.';
+                this.iaCarregando = false;
+            }
+        },
+
+        get formattedTime() {
+            const minutes = Math.floor(this.timeLeft / 60);
+            const seconds = this.timeLeft % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        },
+
+        toggleTimer() {
+            if (this.isTimerRunning) {
+                this.pauseTimer();
+            } else {
+                this.startTimer();
+            }
+        },
+
+        startTimer() {
+            this.isTimerRunning = true;
+            this.timerInterval = setInterval(() => {
+                if (this.timeLeft > 0) {
+                    this.timeLeft--;
+                } else {
+                    this.pauseTimer();
+                    alert(`Sessão de ${this.selectedSubject} concluída!`);
+                }
+            }, 1000);
+        },
+
+        pauseTimer() {
+            this.isTimerRunning = false;
+            clearInterval(this.timerInterval);
+        },
+
+        resetTimer() {
+            this.pauseTimer();
+            this.timeLeft = this.pomodoroTime * 60;
+        },
+
+        skipTimer() {
+            if (this.timeLeft > 300) {
+                this.timeLeft -= 300;
+            } else {
+                this.timeLeft = 0;
+            }
+        },
+
+        menuItems: [
+            { id: 'dashboard', label: 'Dashboard', icon: 'squares-four' },
+            { id: 'timer', label: 'Foco & Timer', icon: 'timer' },
+            { id: 'tasks', label: 'Tarefas', icon: 'check-square-offset' },
+            { id: 'calendar', label: 'Calendário', icon: 'calendar-blank' },
+            { id: 'subjects', label: 'Matérias', icon: 'books' },
+            { id: 'stats', label: 'Estatísticas', icon: 'chart-line-up' },
+            { id: 'assistente', label: 'Assistente IA', icon: 'sparkle' },
+            { id: 'settings', label: 'Configurações', icon: 'gear' },
+        ],
+
+        schedule: [
+            { time: '14:00', duration: '1h 30m', subject: 'Matemática', topic: 'Cálculo Diferencial', icon: 'function', colorClass: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white', status: 'done' },
+            { time: '15:30', duration: '1h 00m', subject: 'Física', topic: 'Cinemática', icon: 'atom', colorClass: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white', status: 'pending' },
+            { time: '17:00', duration: '45m', subject: 'Revisão', topic: 'Geral', icon: 'cards', colorClass: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white', status: 'pending' }
+        ],
+
+        subjects: [
+            { name: 'Matemática', icon: 'function', hours: 42, contentCount: 18, progress: 72, lastStudied: 'Hoje', colorClass: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white' },
+            { name: 'Física', icon: 'atom', hours: 28, contentCount: 12, progress: 48, lastStudied: 'Ontem', colorClass: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white' },
+            { name: 'História', icon: 'bank', hours: 35, contentCount: 22, progress: 83, lastStudied: 'Há 2 dias', colorClass: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 hc:bg-transparent hc:border-2 hc:border-white hc:text-white' },
+            { name: 'Geografia', icon: 'code', hours: 80, contentCount: 40, progress: 95, lastStudied: 'Hoje', colorClass: 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hc:bg-transparent hc:border-2 hc:border-white hc:text-white' }
+        ],
+
+        tasks: [
+            { id: 1, title: 'Resolver atividade', subject: 'Matemática', subjectClass: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', deadline: 'Hoje, 18:00', priority: 'high', type: 'today', done: false },
+            { id: 2, title: 'Ler capítulo 3 do livro de Bibi', subject: 'Física', subjectClass: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400', deadline: 'Amanhã', priority: 'normal', type: 'upcoming', done: false },
+            { id: 3, title: 'Resumo sobre Revolução Industrial', subject: 'História', subjectClass: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', deadline: '05 Set', priority: 'normal', type: 'upcoming', done: true }
+        ],
+
+        weeklyStats: [
+            { day: 'Seg', hours: 3.5 },
+            { day: 'Ter', hours: 4.2 },
+            { day: 'Qua', hours: 2.8 },
+            { day: 'Qui', hours: 5.0 },
+            { day: 'Sex', hours: 4.0 },
+            { day: 'Sáb', hours: 1.5 },
+            { day: 'Dom', hours: 0.0 }
+        ]
+    }
+}
+     </script>   
+</body>
+</html>

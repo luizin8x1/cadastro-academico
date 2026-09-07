@@ -1,0 +1,58 @@
+        /* Scrollbars customizadas */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        
+        /* Scrollbar Alto Contraste */
+        .hc ::-webkit-scrollbar { width: 8px; }
+        .hc ::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 0; border: 1px solid #000; }
+        .hc ::-webkit-scrollbar-track { background: #000000; border-left: 1px solid #333; }
+        
+        [x-cloak] { display: none !important; }
+        
+        .glass-panel {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+/* ==========================================================================
+   Correção de Cores de Texto para o Modo Escuro (Dark Mode) no Dashboard
+   ========================================================================== */
+
+/* Força texto branco/claro em todos os elementos principais e títulos */
+.dark,
+.dark body,
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6,
+.dark p,
+.dark span,
+.dark div,
+.dark a:not(.btn) {
+    color: #f8fafc !important; /* Slate 50 (Branco Suave) */
+}
+
+/* Mantém os textos secundários (datas, horários, legendas) visíveis e legíveis */
+.dark .text-slate-500,
+.dark .text-slate-400,
+.dark .text-slate-600,
+.dark .text-gray-400,
+.dark .text-gray-500 {
+    color: #94a3b8 !important; /* Slate 400 (Cinza Claro) */
+}
+
+/* Garante o contraste dos textos dentro do menu lateral (Sidebar) */
+.dark aside a,
+.dark nav a {
+    color: #cbd5e1 !important; /* Slate 300 */
+}
+
+.dark aside a:hover,
+.dark nav a:hover,
+.dark aside a.active {
+    color: #ffffff !important; /* Branco Puro no Hover e Item Ativo */
+}

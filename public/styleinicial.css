@@ -1,0 +1,12 @@
+[x-cloak] { display: none !important; }
+.glass-panel {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+.hc ::-webkit-scrollbar { width: 8px; }
+.hc ::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 0; border: 1px solid #000; }
+.hc ::-webkit-scrollbar-track { background: #000000; border-left: 1px solid #333; }

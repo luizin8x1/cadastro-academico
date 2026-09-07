@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Do Sucesso - Entrar na plataforma</title>
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="stylelogin.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Configuração Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', 800: '#1e293b', 900: '#0f172a', 950: '#020617'
+                        }
+                    }
+                }
+            },
+            plugins: [
+                function({ addVariant }) {
+                    addVariant('hc', 'body.hc &');
+                }
+            ]
+        }
+    </script>
+</head>
+<body 
+    x-data="authApp()" 
+    :class="{ 'dark': isDarkClass, 'hc': theme === 'hc' }"
+    class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-200 selection:text-blue-900 transition-colors duration-300 hc:bg-black hc:text-white min-h-screen flex"
+>
+    <div class="w-full h-screen flex flex-col md:flex-row dark:bg-slate-950 hc:bg-black relative overflow-hidden">
+        
+        <!-- LADO ESQUERDO: Branding & Visual -->
+        <div class="hidden md:flex md:w-5/12 lg:w-1/2 bg-slate-900 dark:bg-slate-900/50 hc:bg-black hc:border-r-2 hc:border-white relative overflow-hidden flex-col justify-between p-12 text-white border-r border-slate-200/10">
+            <!-- Gradiente decorativo de fundo -->
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none hc:hidden"></div>
+            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none hc:hidden"></div>
+
+            <!-- Logo Centralizada com Destaque -->
+            <div class="flex justify-center mb-10">
+                <img src="img/horizontallogotrans.png" alt="Rota Do Sucesso" class="h-48 sm:h-56 w-auto object-contain filter drop-shadow-lg">
+            </div>
+
+            <!-- Card Showcase Flutuante -->
+            <div class="my-auto z-10 max-w-md">
+                
+
+                <h1 class="text-3xl lg:text-4xl font-bold tracking-tight mb-4 leading-tight">
+                    Um espaço digital silencioso para organizar sua mente.
+                </h1>
+                <p class="text-slate-400 hc:text-gray-300 text-base">
+                    Gerencie disciplinas, cronometre sessões de foco profundo e acompanhe sua evolução acadêmica em uma interface sem distrações.
+                </p>
+            </div>
+
+            <!-- Rodapé esquerdo -->
+            <div class="z-10 flex items-center justify-between text-xs text-slate-400 hc:text-gray-400">
+                <span>© 2026 Rota Do Sucesso</span>
+            </div>
+        </div>
+
+        <!-- LADO DIREITO: Formulário de Autenticação -->
+        <div class="flex-1 flex flex-col justify-between p-6 sm:p-12 md:p-16 relative overflow-y-auto">
+            
+            <!-- Top Bar: Logo mobile + Seletor de Tema -->
+            <div class="flex items-center justify-between w-full max-w-2xl mx-auto gap-4">
+                <div class="flex md:hidden items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600 hc:bg-yellow-400 hc:text-black text-white flex items-center justify-center text-lg font-bold">
+                        <i class="ph-fill ph-graduation-cap"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight">Rota Do Sucesso</span>
+                </div>
+                
+                <div class="ml-auto flex items-center gap-3">
+                    <!-- Seletor Rápido de Tema -->
+                    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 hc:bg-black hc:border hc:border-white p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                        <button @click="theme = 'light'" :class="theme === 'light' ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Tema Claro">
+                            <i class="ph-bold ph-sun"></i>
+                        </button>
+                        <button @click="theme = 'dark'" :class="theme === 'dark' ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Tema Escuro">
+                            <i class="ph-bold ph-moon"></i>
+                        </button>
+                        <button @click="theme = 'hc'" :class="theme === 'hc' ? 'bg-white text-black font-bold' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Alto Contraste">
+                            <i class="ph-bold ph-circle-half-tilt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário Principal -->
+            <div class="w-full max-w-md mx-auto my-auto py-8">
+                
+                <!-- Cabeçalho -->
+                <div class="mb-8">
+                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Bem-vindo(a) de volta</h2>
+                    <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300 text-sm">Digite suas credenciais para acessar seu painel.</p>
+                </div>
+
+                <!-- Formulário -->
+                <form @submit.prevent="handleSubmit" class="space-y-4">
+                    
+                    <!-- E-mail -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1.5">E-mail</label>
+                        <div class="relative flex items-center">
+                            <i class="ph ph-envelope absolute left-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                            <input 
+                                type="email" 
+                                required
+                                x-model="email"
+                                placeholder="estudante@universidade.edu.br"
+                                class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Senha -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white">Senha</label>
+                        </div>
+                        <div class="relative flex items-center">
+                            <i class="ph ph-lock absolute left-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                            <input 
+                                :type="showPassword ? 'text' : 'password'" 
+                                required
+                                x-model="senha"
+                                placeholder="••••••••"
+                                class="w-full pl-10 pr-10 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all"
+                            />
+                            <button 
+                                type="button" 
+                                @click="showPassword = !showPassword"
+                                class="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hc:text-white flex items-center justify-center"
+                            >
+                                <i :class="showPassword ? 'ph ph-eye-slash' : 'ph ph-eye'" class="text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mensagem de erro -->
+                    <p x-show="erro" x-cloak class="text-sm text-red-600 hc:text-yellow-300" x-text="erro"></p>
+
+                    <!-- Botão de Envio -->
+                    <button 
+                        type="submit"
+                        class="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 text-white font-medium rounded-xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                    >
+                        <span>Acessar plataforma</span>
+                        <i class="ph-bold ph-arrow-right text-lg"></i>
+                    </button>
+                </form>
+
+                <!-- Link para direcionar ao Cadastro -->
+                <p class="text-center text-sm text-slate-500 dark:text-slate-400 mt-8">
+                    <span>Ainda não usa o Rota Do Sucesso?</span>
+                    <a 
+                        href="create_account.html" 
+                        class="font-semibold text-blue-600 dark:text-blue-400 hc:text-yellow-300 hover:underline ml-1"
+                    >
+                        Crie sua conta agora
+                    </a>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Lógica Alpine.js -->
+    <script>
+    function authApp() {
+        return {
+            showPassword: false,
+            theme: 'auto',
+            isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+            email: '',
+            senha: '',
+            erro: '',
+
+            get isDarkClass() {
+                return this.theme === 'dark' || (this.theme === 'auto' && this.isSystemDark) || this.theme === 'hc';
+            },
+
+            async handleSubmit() {
+                this.erro = '';
+
+                try {
+                    const resposta = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: this.email, senha: this.senha }),
+                    });
+
+                    const dados = await resposta.json();
+
+                    if (!resposta.ok) {
+                        this.erro = dados.erro || 'Erro ao entrar.';
+                        return;
+                    }
+
+                    sessionStorage.setItem('usuarioId', dados.usuarioId);
+                    window.location.href = "main.html";
+
+                } catch (err) {
+                    this.erro = 'Erro de conexão com o servidor.';
+                }
+            }
+        }
+    }
+    </script>
+</body>
+</html>
