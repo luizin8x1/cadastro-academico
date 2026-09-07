@@ -1,5 +1,5 @@
 require("dotenv").config();
-// teste
+// teste 1
 const express = require("express");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
