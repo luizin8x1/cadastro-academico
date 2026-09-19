@@ -23,6 +23,67 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
+// O Neon fecha conexões ociosas. Sem este handler, o erro de uma conexão parada
+// derruba o servidor inteiro (e aí nenhuma tela funciona, inclusive criar conta).
+pool.on("error", (err) => {
+  console.error("Conexão ociosa do banco encerrada (será recriada):", err.message);
+});
+process.on("unhandledRejection", (motivo) => {
+  console.error("Erro não tratado:", motivo);
+});
+
+// Traduz o erro do Postgres numa mensagem que ajuda a achar o problema.
+// O texto técnico (detalhe) só vai para o navegador fora de produção.
+function descreverErroBanco(err) {
+  const detalhe = err && err.message ? err.message : String(err);
+  let erro = "Erro ao acessar o banco de dados.";
+
+  switch (err && err.code) {
+    case "42703":
+      erro = "O banco não tem uma coluna que o servidor espera (a estrutura do banco mudou).";
+      break;
+    case "42P01":
+      erro = "O banco não tem uma tabela que o servidor espera (a estrutura do banco mudou).";
+      break;
+    case "23502":
+      erro = "O banco exige um campo obrigatório que o cadastro não está enviando.";
+      break;
+    case "23503":
+      erro = "O banco recusou o cadastro por causa de uma relação entre tabelas (chave estrangeira).";
+      break;
+    case "23505":
+      erro = "Já existe um registro com esses dados (e-mail ou usuário repetido).";
+      break;
+    case "22001":
+      erro = "Um dos textos é grande demais para a coluna do banco.";
+      break;
+    case "22P02":
+    case "22007":
+    case "42804":
+      erro = "Um dos valores tem tipo diferente do que a coluna do banco espera.";
+      break;
+    case "28P01":
+    case "28000":
+      erro = "Usuário ou senha do banco incorretos (confira o arquivo .env).";
+      break;
+    case "ENOTFOUND":
+    case "ECONNREFUSED":
+    case "ETIMEDOUT":
+    case "ECONNRESET":
+      erro = "Não foi possível conectar ao banco de dados (confira o .env e a internet).";
+      break;
+    default:
+      if (/Connection terminated|timeout|ECONN/i.test(detalhe)) {
+        erro = "A conexão com o banco caiu. Tente de novo em alguns segundos.";
+      }
+  }
+
+  return {
+    erro,
+    detalhe: process.env.NODE_ENV === "production" ? undefined : detalhe,
+  };
+}
+
 pool
   .query("SELECT NOW()")
   .then(() => console.log("Conectado ao banco Neon com sucesso."))
@@ -66,8 +127,9 @@ app.post("/api/cadastro", async (req, res) => {
       .json({ erro: "A senha deve ter pelo menos 6 caracteres." });
   }
 
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
 
     const existe = await client.query(
@@ -100,10 +162,10 @@ app.post("/api/cadastro", async (req, res) => {
         dataNascimento,
         SERIE_LABELS[serie] || String(serie),
         serie,
-        REDE_LABELS[redeEnsino] || null,
+        REDE_BANCO[redeEnsino] || null,
         curso,
         universidade,
-        REDE_LABELS[tipoInstituicao] || null,
+        REDE_BANCO[tipoInstituicao] || null,
         objetivoTextoFinal(objetivo, objetivoOutro),
       ]
     );
@@ -111,11 +173,14 @@ app.post("/api/cadastro", async (req, res) => {
     await client.query("COMMIT");
     res.json({ sucesso: true, usuarioId });
   } catch (err) {
-    await client.query("ROLLBACK");
-    console.error(err);
-    res.status(500).json({ erro: "Erro ao cadastrar usuário." });
+    if (client) {
+      await client.query("ROLLBACK").catch(() => {});
+    }
+    console.error("Erro ao cadastrar usuário:", err.code || "", err.message);
+    const { erro, detalhe } = descreverErroBanco(err);
+    res.status(500).json({ erro: `Não foi possível criar a conta. ${erro}`, detalhe });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 });
 
@@ -148,8 +213,9 @@ app.post("/api/login", async (req, res) => {
 
     res.json({ sucesso: true, usuarioId: usuario.id });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ erro: "Erro ao entrar." });
+    console.error("Erro ao entrar:", err.code || "", err.message);
+    const { erro, detalhe } = descreverErroBanco(err);
+    res.status(500).json({ erro: `Erro ao entrar. ${erro}`, detalhe });
   }
 });
 
@@ -248,10 +314,10 @@ app.put("/api/perfil/:usuarioId", async (req, res) => {
         dataNascimento,
         SERIE_LABELS[serie] || String(serie),
         serie,
-        REDE_LABELS[redeEnsino] || null,
+        REDE_BANCO[redeEnsino] || null,
         curso,
         universidade,
-        REDE_LABELS[tipoInstituicao] || null,
+        REDE_BANCO[tipoInstituicao] || null,
         objetivoTextoFinal(objetivo, objetivoOutro),
         usuarioId,
       ]
@@ -618,8 +684,13 @@ const SERIE_LABELS = {
   7: "2º Ano - Ensino Médio",
   8: "3º Ano - Ensino Médio",
 };
+// Texto bonito (usado no prompt da IA) — NÃO é o que vai para o banco.
 const REDE_LABELS = { 1: "Pública", 2: "Particular" };
-const CODIGO_REDE = { Pública: 1, Particular: 2 };
+// O banco tem CHECK em perfil_academico.rede_ensino e tipo_universidade:
+// só aceita exatamente 'publica' ou 'particular' (minúsculo, sem acento).
+const REDE_BANCO = { 1: "publica", 2: "particular" };
+const CODIGO_REDE = { publica: 1, particular: 2 };
+const REDE_TEXTO_BANCO = { publica: "Pública", particular: "Particular" };
 const OBJETIVO_LABELS = {
   1: "Passar no ENEM",
   2: "Passar no vestibular",
@@ -672,7 +743,7 @@ function montarPromptAssistente(perfil, cronograma, rotina = {}) {
   // perfil_academico já guarda texto pronto (serie, rede_ensino, tipo_universidade,
   // objetivo_geral) — não precisa mais de lookup de código aqui.
   const serieTexto = perfil.serie || "não informado";
-  const redeTexto = perfil.rede_ensino || "não informado";
+  const redeTexto = REDE_TEXTO_BANCO[perfil.rede_ensino] || perfil.rede_ensino || "não informado";
   const objetivoTexto = perfil.objetivo_geral || "não informado";
 
   const diasTexto = (cronograma.dias_semana || [])
@@ -707,7 +778,7 @@ Dados do perfil do aluno (criados na conta):
 - Rede de ensino: ${redeTexto}
 - Curso/foco: ${perfil.curso_desejado || "não informado"}
 - Universidade de interesse: ${perfil.universidade_desejada || "não informado"}
-- Tipo de instituição superior desejada: ${perfil.tipo_universidade || "não informado"}
+- Tipo de instituição superior desejada: ${REDE_TEXTO_BANCO[perfil.tipo_universidade] || perfil.tipo_universidade || "não informado"}
 - Meta/objetivo principal: ${objetivoTexto}
 
 Preferências de estudo (formulário de cronograma personalizado):
