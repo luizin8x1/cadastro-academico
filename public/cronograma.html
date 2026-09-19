@@ -116,11 +116,11 @@
                         </button>
                     </div>
                     <a
-                        href="perfil-visualizar.html"
+                        href="main.html"
                         class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 hc:text-white hc:hover:text-yellow-300 rounded-lg transition-all"
                     >
                         <i class="ph-bold ph-arrow-left text-lg"></i>
-                        <span class="hidden sm:inline">Voltar ao perfil</span>
+                        <span class="hidden sm:inline">Voltar à tela principal</span>
                     </a>
                 </div>
             </div>
@@ -172,6 +172,73 @@
                                             <input type="checkbox" :value="dia.id" x-model="diasSemana" class="sr-only">
                                             <span class="text-xs font-semibold text-slate-700 dark:text-slate-200 hc:text-white" x-text="dia.label"></span>
                                         </label>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Rotina semanal: aparece só para os dias marcados acima -->
+                            <div x-show="diasSelecionados.length > 0" x-cloak>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1">Como é sua rotina hoje?</label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300 mb-3">
+                                    Conte o que você já faz em cada dia (aula, trabalho, sono...), com o horário. Assim os estudos não batem com seus compromissos. Este campo é opcional.
+                                </p>
+
+                                <div class="space-y-3">
+                                    <template x-for="dia in diasSelecionados" :key="dia.id">
+                                        <div class="p-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl">
+                                            <div class="text-sm font-semibold text-slate-700 dark:text-slate-200 hc:text-white mb-2" x-text="dia.nome"></div>
+
+                                            <div class="space-y-2">
+                                                <template x-for="(linha, idx) in rotina[dia.id]" :key="linha.uid">
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <!-- Caixinha 1: horário (de / até) -->
+                                                        <div class="flex items-center gap-1.5 shrink-0">
+                                                            <input
+                                                                type="time"
+                                                                x-model="linha.inicio"
+                                                                aria-label="Início"
+                                                                class="w-[6.25rem] px-2 py-2 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
+                                                            />
+                                                            <span class="text-xs text-slate-500 dark:text-slate-400 hc:text-white">até</span>
+                                                            <input
+                                                                type="time"
+                                                                x-model="linha.fim"
+                                                                aria-label="Fim"
+                                                                class="w-[6.25rem] px-2 py-2 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
+                                                            />
+                                                        </div>
+
+                                                        <!-- Caixinha 2: o que você faz -->
+                                                        <input
+                                                            type="text"
+                                                            maxlength="100"
+                                                            x-model="linha.descricao"
+                                                            placeholder="O que você faz?"
+                                                            class="min-w-[10rem] flex-1 px-3 py-2 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
+                                                        />
+
+                                                        <button
+                                                            type="button"
+                                                            @click="removerLinha(dia.id, idx)"
+                                                            title="Remover"
+                                                            aria-label="Remover atividade"
+                                                            class="p-2 text-slate-400 hover:text-red-500 hc:text-white hc:hover:text-yellow-300 rounded-lg transition-all"
+                                                        >
+                                                            <i class="ph-bold ph-x"></i>
+                                                        </button>
+                                                    </div>
+                                                </template>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                @click="adicionarLinha(dia.id)"
+                                                class="mt-2 flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 hc:text-yellow-300"
+                                            >
+                                                <i class="ph-bold ph-plus"></i>
+                                                <span>Adicionar atividade</span>
+                                            </button>
+                                        </div>
                                     </template>
                                 </div>
                             </div>
@@ -280,14 +347,19 @@
                 periodoPreferido: '',
                 duracaoFoco: '',
 
+                // Rotina semanal: { seg: [{ uid, inicio, fim, descricao }], ... }
+                // Guarda todos os dias, mas só os marcados aparecem/são enviados.
+                rotina: { seg: [], ter: [], qua: [], qui: [], sex: [], sab: [], dom: [] },
+                proximoUid: 1,
+
                 diasOptions: [
-                    { id: 'seg', label: 'Seg' },
-                    { id: 'ter', label: 'Ter' },
-                    { id: 'qua', label: 'Qua' },
-                    { id: 'qui', label: 'Qui' },
-                    { id: 'sex', label: 'Sex' },
-                    { id: 'sab', label: 'Sáb' },
-                    { id: 'dom', label: 'Dom' },
+                    { id: 'seg', label: 'Seg', nome: 'Segunda-feira' },
+                    { id: 'ter', label: 'Ter', nome: 'Terça-feira' },
+                    { id: 'qua', label: 'Qua', nome: 'Quarta-feira' },
+                    { id: 'qui', label: 'Qui', nome: 'Quinta-feira' },
+                    { id: 'sex', label: 'Sex', nome: 'Sexta-feira' },
+                    { id: 'sab', label: 'Sáb', nome: 'Sábado' },
+                    { id: 'dom', label: 'Dom', nome: 'Domingo' },
                 ],
                 materiasOptions: [
                     { id: 'matematica', label: 'Matemática' },
@@ -308,6 +380,30 @@
                     { id: '4', label: 'Madrugada' },
                 ],
 
+                // Dias marcados, na ordem da semana (não na ordem em que foram clicados).
+                get diasSelecionados() {
+                    return this.diasOptions.filter(d => this.diasSemana.includes(d.id));
+                },
+
+                novaLinha(dados = {}) {
+                    return {
+                        uid: this.proximoUid++,
+                        inicio: dados.inicio || '',
+                        fim: dados.fim || '',
+                        descricao: dados.descricao || '',
+                    };
+                },
+
+                adicionarLinha(diaId) {
+                    this.rotina[diaId].push(this.novaLinha());
+                },
+
+                removerLinha(diaId, idx) {
+                    this.rotina[diaId].splice(idx, 1);
+                    // Mantém sempre pelo menos uma linha em branco para preencher.
+                    if (this.rotina[diaId].length === 0) this.adicionarLinha(diaId);
+                },
+
                 get isDarkClass() {
                     return this.theme === 'dark' || (this.theme === 'auto' && this.isSystemDark) || this.theme === 'hc';
                 },
@@ -319,6 +415,7 @@
                         return;
                     }
                     this.usuarioId = usuarioId;
+                    this.diasOptions.forEach(d => this.adicionarLinha(d.id));
                     await this.carregarCronograma();
                 },
 
@@ -349,6 +446,15 @@
                         this.periodoPreferido = String(dados.periodoPreferido || '');
                         this.duracaoFoco = String(dados.duracaoFoco || '');
 
+                        // Rotina semanal salva: troca a linha em branco pelas atividades do banco.
+                        const rotinaSalva = dados.rotina || {};
+                        this.diasOptions.forEach(d => {
+                            const linhas = rotinaSalva[d.id] || [];
+                            this.rotina[d.id] = linhas.length
+                                ? linhas.map(l => this.novaLinha(l))
+                                : [this.novaLinha()];
+                        });
+
                     } catch (err) {
                         this.carregando = false;
                         this.erro = 'Erro de conexão com o servidor.';
@@ -368,6 +474,34 @@
                         return;
                     }
 
+                    // Monta a rotina só com os dias marcados; linhas 100% vazias são ignoradas.
+                    const rotinaEnvio = {};
+                    for (const dia of this.diasSelecionados) {
+                        const linhas = [];
+                        for (const l of this.rotina[dia.id]) {
+                            const inicio = (l.inicio || '').trim();
+                            const fim = (l.fim || '').trim();
+                            const descricao = (l.descricao || '').trim();
+
+                            if (!inicio && !fim && !descricao) continue;
+
+                            if (!inicio || !fim) {
+                                this.erro = `Informe o horário de início e de fim em ${dia.nome}.`;
+                                return;
+                            }
+                            if (inicio === fim) {
+                                this.erro = `Em ${dia.nome}, o início e o fim não podem ser iguais.`;
+                                return;
+                            }
+                            if (!descricao) {
+                                this.erro = `Escreva o que você faz no horário das ${inicio} em ${dia.nome}.`;
+                                return;
+                            }
+                            linhas.push({ inicio, fim, descricao });
+                        }
+                        rotinaEnvio[dia.id] = linhas;
+                    }
+
                     this.salvando = true;
 
                     try {
@@ -381,6 +515,7 @@
                                 materiaDificilOutra: this.materiasDificeis.includes('outra') ? this.materiaDificilOutra : null,
                                 periodoPreferido: this.periodoPreferido,
                                 duracaoFoco: this.duracaoFoco,
+                                rotina: rotinaEnvio,
                             }),
                         });
 

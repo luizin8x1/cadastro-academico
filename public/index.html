@@ -72,11 +72,15 @@
                 </div>
 
                 <!-- Botões de Acesso -->
-                <a href="login.html" class="hidden sm:inline-block text-sm font-semibold text-blue-100 hover:text-white hc:text-yellow-300 transition-colors">
+                <a x-show="!logado" href="login.html" class="hidden sm:inline-block text-sm font-semibold text-blue-100 hover:text-white hc:text-yellow-300 transition-colors">
                     Entrar
                 </a>
-                <a href="create_account.html" class="py-2 px-4 bg-white text-blue-600 hover:bg-blue-50 dark:bg-blue-600 dark:hover:bg-blue-500 dark:text-white hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 font-medium text-sm rounded-xl shadow-sm transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                <a x-show="!logado" href="create_account.html" class="py-2 px-4 bg-white text-blue-600 hover:bg-blue-50 dark:bg-blue-600 dark:hover:bg-blue-500 dark:text-white hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 font-medium text-sm rounded-xl shadow-sm transition-all hover:-translate-y-0.5 flex items-center gap-2">
                     <span>Criar conta</span>
+                    <i class="ph-bold ph-arrow-right"></i>
+                </a>
+                <a x-show="logado" x-cloak href="main.html" class="py-2 px-4 bg-white text-blue-600 hover:bg-blue-50 dark:bg-blue-600 dark:hover:bg-blue-500 dark:text-white hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 font-medium text-sm rounded-xl shadow-sm transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                    <span>Ir para o dashboard</span>
                     <i class="ph-bold ph-arrow-right"></i>
                 </a>
             </div>
@@ -109,8 +113,8 @@
                 </p>
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-                    <a href="login.html" class="w-full sm:w-auto py-3.5 px-8 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 text-white font-medium rounded-xl shadow-lg transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-base">
-                        <span>Comece agora gratuitamente</span>
+                    <a :href="logado ? 'main.html' : 'login.html'" class="w-full sm:w-auto py-3.5 px-8 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 text-white font-medium rounded-xl shadow-lg transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-base">
+                        <span x-text="logado ? 'Ir para o dashboard' : 'Comece agora gratuitamente'">Comece agora gratuitamente</span>
                         <i class="ph-bold ph-arrow-right text-lg"></i>
                     </a>
                 </div>
@@ -227,8 +231,8 @@
                     <p class="text-slate-300 hc:text-gray-300 text-base max-w-xl mx-auto mb-8">
                         Crie sua conta em poucos segundos, defina seus objetivos e descubra uma nova forma de estudar.
                     </p>
-                    <a href="login.html" class="inline-flex items-center gap-2 py-3.5 px-8 bg-blue-600 hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold font-medium rounded-xl transition-all hover:-translate-y-0.5">
-                        <span>Criar minha conta agora</span>
+                    <a :href="logado ? 'main.html' : 'login.html'" class="inline-flex items-center gap-2 py-3.5 px-8 bg-blue-600 hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold font-medium rounded-xl transition-all hover:-translate-y-0.5">
+                        <span x-text="logado ? 'Voltar ao meu dashboard' : 'Criar minha conta agora'">Criar minha conta agora</span>
                         <i class="ph-bold ph-arrow-right"></i>
                     </a>
                 </div>
@@ -253,6 +257,10 @@
             return {
                 theme: localStorage.getItem('user_theme') || 'light',
                 isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+
+                // Quem chega aqui pelo logo do dashboard continua logado (a sessão fica
+                // no sessionStorage e esta página não mexe nela).
+                logado: !!sessionStorage.getItem('usuarioId'),
 
                 init() {
                     this.$watch('theme', value => localStorage.setItem('user_theme', value));

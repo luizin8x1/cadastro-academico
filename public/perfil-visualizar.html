@@ -104,6 +104,14 @@
                 </div>
 
                 <div class="ml-auto flex items-center gap-3">
+                    <a
+                        href="main.html"
+                        class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 hc:text-white hc:hover:text-yellow-300 rounded-lg transition-all"
+                        title="Voltar à tela principal"
+                    >
+                        <i class="ph-bold ph-arrow-left text-lg"></i>
+                        <span class="hidden sm:inline">Voltar à tela principal</span>
+                    </a>
                     <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 hc:bg-black hc:border hc:border-white p-1 rounded-xl border border-slate-200 dark:border-slate-800">
                         <button @click="theme = 'light'" :class="theme === 'light' ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Tema Claro">
                             <i class="ph-bold ph-sun"></i>
@@ -152,23 +160,6 @@
                                 <span class="text-slate-500 dark:text-slate-400 hc:text-gray-300" x-text="email"></span>
                             </div>
                         </div>
-
-                        <!-- Cronograma Personalizado -->
-                        <a
-                            href="cronograma.html"
-                            class="w-full flex items-center justify-between gap-3 p-4 mb-6 bg-blue-50 dark:bg-blue-950/40 hc:bg-black border border-blue-200 dark:border-blue-900 hc:border-white rounded-xl hover:border-blue-400 transition-all group"
-                        >
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg bg-blue-600 hc:bg-yellow-400 hc:text-black flex items-center justify-center text-white flex-shrink-0">
-                                    <i class="ph-bold ph-calendar-check text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 hc:text-white">Cronograma Personalizado</p>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300">Responda algumas perguntas e monte seu plano de estudos</p>
-                                </div>
-                            </div>
-                            <i class="ph-bold ph-arrow-right text-slate-400 group-hover:translate-x-1 transition-transform flex-shrink-0"></i>
-                        </a>
 
                         <form @submit.prevent="handleSubmit" class="space-y-5">
 
