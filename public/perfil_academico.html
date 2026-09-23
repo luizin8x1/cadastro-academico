@@ -120,7 +120,34 @@
 
             <!-- Formulário Principal -->
             <div class="w-full max-w-md mx-auto my-auto py-8">
-                
+
+                <!-- Indicador de Etapas -->
+                <div class="w-full mb-8" role="group" aria-label="Progresso do cadastro">
+                    <ol class="flex items-center">
+                        <!-- Etapa 1: Conta (concluída) -->
+                        <li class="flex items-center text-blue-600 dark:text-blue-400 hc:text-yellow-400">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 hc:bg-yellow-400 shrink-0">
+                                <i class="ph-bold ph-check text-white hc:text-black text-sm"></i>
+                            </div>
+                            <span class="ml-2 text-xs font-semibold hidden sm:inline whitespace-nowrap">Conta</span>
+                        </li>
+                        <li class="flex-1 h-0.5 mx-2 sm:mx-3 bg-blue-600 hc:bg-yellow-400" aria-hidden="true"></li>
+
+                        <!-- Etapa 2: Perfil Acadêmico (atual) -->
+                        <li class="flex items-center text-slate-800 dark:text-white hc:text-white" aria-current="step">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 hc:bg-yellow-400 ring-4 ring-blue-100 dark:ring-blue-900/50 hc:ring-0 text-white hc:text-black text-xs font-bold shrink-0">2</div>
+                            <span class="ml-2 text-xs font-semibold hidden sm:inline whitespace-nowrap">Perfil Acadêmico</span>
+                        </li>
+                        <li class="flex-1 h-0.5 mx-2 sm:mx-3 bg-slate-200 dark:bg-slate-800 hc:bg-white/30" aria-hidden="true"></li>
+
+                        <!-- Etapa 3: Concluir (pendente) -->
+                        <li class="flex items-center text-slate-400 dark:text-slate-500 hc:text-gray-400">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 hc:bg-black hc:border hc:border-white/40 text-slate-400 dark:text-slate-500 hc:text-gray-400 text-xs font-bold shrink-0">3</div>
+                            <span class="ml-2 text-xs font-medium hidden sm:inline whitespace-nowrap">Concluir</span>
+                        </li>
+                    </ol>
+                </div>
+
                 <div class="mb-6">
                     <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Perfil Acadêmico</h2>
                     <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300 text-sm">Preencha seus dados acadêmicos para finalizar seu cadastro.</p>
@@ -137,6 +164,7 @@
                                 type="date" 
                                 required
                                 x-model="dataNascimento"
+                                :max="maxNascimento"
                                 class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
                             />
                         </div>
@@ -144,7 +172,7 @@
 
                     <!-- Série/Ano Escolar -->
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1.5">Série/Ano escolar (2026)</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1.5">Série/Ano escolar (<span x-text="anoAtual"></span>)</label>
                         <div class="relative flex items-center">
                             <i class="ph ph-student absolute left-3.5 text-slate-400 text-lg pointer-events-none"></i>
                             <select 
@@ -236,6 +264,7 @@
                                     <input 
                                         type="radio" 
                                         name="objetivo" 
+                                        required
                                         :value="option.id" 
                                         x-model="selectedObjetivo"
                                         class="accent-blue-600 hc:accent-yellow-400"
@@ -249,8 +278,9 @@
                                 <input 
                                     type="text" 
                                     maxlength="150"
+                                    :required="selectedObjetivo === 'outro'"
                                     x-model="objetivoOutroTexto"
-                                    placeholder="Especifique (se marcou Outro)"
+                                    placeholder="Especifique seu objetivo"
                                     class="w-full px-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
                                 />
                             </div>
@@ -263,10 +293,21 @@
                     <!-- Botão de Envio -->
                     <button 
                         type="submit"
-                        class="w-full mt-4 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 text-white font-medium rounded-xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                        :disabled="isSubmitting"
+                        class="w-full mt-4 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 text-white font-medium rounded-xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                     >
-                        <span>Finalizar cadastro</span>
-                        <i class="ph-bold ph-check-circle text-lg"></i>
+                        <template x-if="!isSubmitting">
+                            <span class="flex items-center gap-2">
+                                <span>Finalizar cadastro</span>
+                                <i class="ph-bold ph-check-circle text-lg"></i>
+                            </span>
+                        </template>
+                        <template x-if="isSubmitting">
+                            <span class="flex items-center gap-2">
+                                <i class="ph-bold ph-circle-notch text-lg animate-spin"></i>
+                                <span>Enviando...</span>
+                            </span>
+                        </template>
                     </button>
                 </form>
 
@@ -291,6 +332,8 @@
             return {
                 theme: 'auto',
                 isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+                anoAtual: new Date().getFullYear(),
+                isSubmitting: false,
                 selectedObjetivo: '',
                 objetiveOptions: [
                     { id: 'enem', label: 'Passar no ENEM' },
@@ -314,6 +357,16 @@
                     return this.theme === 'dark' || (this.theme === 'auto' && this.isSystemDark) || this.theme === 'hc';
                 },
 
+                // Data de hoje no formato YYYY-MM-DD usando o fuso horário local
+                // (evita o desvio de um dia que o toISOString(), baseado em UTC, causaria).
+                get maxNascimento() {
+                    const hoje = new Date();
+                    const ano = hoje.getFullYear();
+                    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                    const dia = String(hoje.getDate()).padStart(2, '0');
+                    return `${ano}-${mes}-${dia}`;
+                },
+
                 init() {
                     // Esta tela é a etapa 2 do cadastro — precisa que nome/e-mail/senha
                     // já tenham sido preenchidos na etapa 1 (create_account.html).
@@ -322,8 +375,31 @@
                     }
                 },
 
+                // Traduz a resposta do servidor em uma mensagem clara para o usuário.
+                // Aceita as chaves mais comuns que um back-end costuma devolver.
+                mensagemDeErro(status, dados) {
+                    const doServidor = dados && (dados.erro || dados.error || dados.mensagem || dados.message);
+
+                    if (status === 404 || status === 405) {
+                        return 'O servidor não encontrou a rota /api/cadastro (erro ' + status + '). Confirme que o back-end está rodando e acesse o site pelo endereço dele (ex.: http://localhost:3000), não por outro servidor de arquivos.';
+                    }
+                    if (status === 409) {
+                        return doServidor || 'Este e-mail já está cadastrado. Volte e use outro e-mail ou entre na sua conta.';
+                    }
+                    if (status === 400 || status === 422) {
+                        return doServidor || 'Algum dado enviado é inválido. Revise os campos e tente novamente.';
+                    }
+                    if (status >= 500) {
+                        return (doServidor || 'O servidor encontrou um erro ao salvar') + ' (erro ' + status + '). Veja o terminal do servidor para o detalhe.';
+                    }
+                    return doServidor || 'Erro ao salvar cadastro (código ' + status + '). Tente novamente.';
+                },
+
                 async handleSubmit() {
                     this.erro = '';
+
+                    // Evita duplo envio se o usuário clicar mais de uma vez.
+                    if (this.isSubmitting) return;
 
                     const cadastroPendenteRaw = sessionStorage.getItem('cadastroPendente');
                     if (!cadastroPendenteRaw) {
@@ -332,27 +408,84 @@
                     }
                     const cadastroPendente = JSON.parse(cadastroPendenteRaw);
 
+                    // --- Validações complementares (campos que o HTML sozinho não cobre) ---
+
+                    if (!this.selectedObjetivo || !OBJETIVO_MAP[this.selectedObjetivo]) {
+                        this.erro = 'Selecione o que você deseja alcançar.';
+                        return;
+                    }
+                    if (this.selectedObjetivo === 'outro' && this.objetivoOutroTexto.trim().length === 0) {
+                        this.erro = 'Especifique seu objetivo no campo "Outro".';
+                        return;
+                    }
+                    if (this.dataNascimento > this.maxNascimento) {
+                        this.erro = 'A data de nascimento não pode ser no futuro.';
+                        return;
+                    }
+                    if (!SERIE_MAP[this.serie]) {
+                        this.erro = 'Selecione sua série/ano escolar.';
+                        return;
+                    }
+                    if (!REDE_MAP[this.redeEnsino]) {
+                        this.erro = 'Selecione a rede de ensino da sua escola.';
+                        return;
+                    }
+
+                    // Campos opcionais: string vazia vira null, para o back-end
+                    // receber explicitamente "não informado" em vez de "".
+                    const cursoNormalizado = this.curso.trim() || null;
+                    const universidadeNormalizada = this.universidade.trim() || null;
+                    const tipoInstituicaoNormalizado = this.tipoSuperior ? REDE_MAP[this.tipoSuperior] : null;
+
+                    this.isSubmitting = true;
+
+                    const payload = {
+                        ...cadastroPendente,
+                        dataNascimento: this.dataNascimento,
+                        serie: SERIE_MAP[this.serie],
+                        redeEnsino: REDE_MAP[this.redeEnsino],
+                        curso: cursoNormalizado,
+                        universidade: universidadeNormalizada,
+                        tipoInstituicao: tipoInstituicaoNormalizado,
+                        objetivo: OBJETIVO_MAP[this.selectedObjetivo],
+                        objetivoOutro: this.selectedObjetivo === 'outro' ? this.objetivoOutroTexto.trim() : null,
+                    };
+
                     try {
                         const resposta = await fetch('/api/cadastro', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                ...cadastroPendente,
-                                dataNascimento: this.dataNascimento,
-                                serie: SERIE_MAP[this.serie],
-                                redeEnsino: REDE_MAP[this.redeEnsino],
-                                curso: this.curso,
-                                universidade: this.universidade,
-                                tipoInstituicao: REDE_MAP[this.tipoSuperior],
-                                objetivo: OBJETIVO_MAP[this.selectedObjetivo],
-                                objetivoOutro: this.selectedObjetivo === 'outro' ? this.objetivoOutroTexto : null,
-                            }),
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify(payload),
                         });
 
-                        const dados = await resposta.json();
+                        // Lê o corpo como texto primeiro: assim, mesmo que o servidor
+                        // responda HTML ou texto puro (erro 404/500), conseguimos ver
+                        // o que veio em vez de perder a informação.
+                        const corpoTexto = await resposta.text();
+                        let dados = {};
+                        try {
+                            dados = corpoTexto ? JSON.parse(corpoTexto) : {};
+                        } catch (parseErr) {
+                            dados = {};
+                        }
 
                         if (!resposta.ok) {
-                            this.erro = dados.erro || 'Erro ao salvar cadastro.';
+                            // Aparece no Console (F12) para facilitar o diagnóstico.
+                            console.error('[cadastro] Falha ao salvar', {
+                                status: resposta.status,
+                                url: resposta.url,
+                                respostaDoServidor: corpoTexto.slice(0, 500),
+                                enviado: { ...payload, senha: '***' },
+                            });
+                            this.erro = this.mensagemDeErro(resposta.status, dados);
+                            return;
+                        }
+                        if (!dados.usuarioId) {
+                            console.error('[cadastro] Resposta sem usuarioId', corpoTexto.slice(0, 500));
+                            this.erro = 'Cadastro processado, mas a resposta do servidor veio incompleta.';
                             return;
                         }
 
@@ -361,7 +494,10 @@
                         window.location.href = "main.html";
 
                     } catch (err) {
-                        this.erro = 'Erro de conexão com o servidor.';
+                        console.error('[cadastro] Não foi possível falar com o servidor', err);
+                        this.erro = 'Erro de conexão com o servidor. Verifique se o back-end está rodando e se você abriu o site pelo endereço dele (ex.: http://localhost:3000).';
+                    } finally {
+                        this.isSubmitting = false;
                     }
                 }
             }
