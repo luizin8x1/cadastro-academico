@@ -48,6 +48,27 @@
             ]
         }
     </script>
+    <!-- Restaura o tema salvo antes da interface aparecer, evitando "piscar" entre os temas -->
+    <script>
+        (function () {
+            try {
+                const temaSalvo = localStorage.getItem('theme');
+                const temasValidos = ['light', 'dark', 'auto', 'hc'];
+                const tema = temasValidos.includes(temaSalvo) ? temaSalvo : 'light';
+                const sistemaEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                if (tema === 'dark' || tema === 'hc' || (tema === 'auto' && sistemaEscuro)) {
+                    document.documentElement.classList.add('dark');
+                }
+                if (tema === 'hc') {
+                    document.documentElement.classList.add('hc');
+                }
+            } catch (e) {
+                // Se o localStorage não estiver disponível, a aplicação usa o tema padrão.
+            }
+        })();
+    </script>
+    
 </head>
 <body 
     x-data="studyApp()" 
@@ -61,46 +82,103 @@
     <div class="dark:bg-slate-950 min-h-screen flex transition-colors duration-300 overflow-hidden hc:bg-black">
         
         <!-- SIDEBAR (Desktop) -->
-        <aside class="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 hc:bg-black hc:border-white hc:border-r-2 transition-all duration-300 z-20">
+        <aside class="hidden md:flex flex-col w-64 h-screen min-h-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 hc:bg-black hc:border-white hc:border-r-2 transition-all duration-300 z-20">
             <div class="h-20 flex items-center px-6 border-b border-slate-100 dark:border-slate-800 hc:border-white">
                 <a href="index.html" class="flex items-center">
                 <img src="img/horizontallogotransline.png" alt="Rota Do Sucesso" class="h-20 w-auto object-contain">
             </a>
             </div>
+
+            <!-- Atalhos Rápidos -->
             
-            <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
-                <template x-for="item in menuItems" :key="item.id">
-                    <button 
-                        @click="currentTab = item.id"
-                        class="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 group"
-                        :class="currentTab === item.id 
-                            ? `${accentBgBase} font-medium shadow-sm` 
-                            : 'hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black text-slate-600 dark:text-slate-300 hc:text-white'"
-                    >
-                        <i :class="`ph ph-${item.icon} text-xl transition-transform duration-200 group-hover:scale-110`" 
-                           :class="currentTab === item.id ? 'ph-fill' : ''"></i>
-                        <span class="ml-3" x-text="item.label"></span>
-                    </button>
+            
+            <nav class="flex-1 min-h-0 py-5 px-4 space-y-5 overflow-y-auto">
+                <template x-for="group in menuGroups" :key="group.id">
+                    <div>
+                        <p class="px-3 mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hc:text-yellow-300 flex items-center gap-1.5">
+                            <i :class="`ph-bold ph-${group.icon}`"></i>
+                            <span x-text="group.label"></span>
+                        </p>
+                        <div class="space-y-1">
+                            <template x-for="item in group.items" :key="item.id">
+                                <button
+                                    @click="currentTab = item.id"
+                                    class="w-full flex items-center pl-7 pr-4 py-2.5 rounded-xl transition-all duration-200 group/item text-sm"
+                                    :class="currentTab === item.id
+                                        ? `${accentBgBase} font-medium shadow-sm`
+                                        : 'hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black text-slate-600 dark:text-slate-300 hc:text-white'"
+                                >
+                                    <i :class="`ph ph-${item.icon} text-base transition-transform duration-200 group-hover/item:scale-110`"
+                                       :class="currentTab === item.id ? 'ph-fill' : ''"></i>
+                                    <span class="ml-3" x-text="item.label"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
                 </template>
 
+                <!-- Assistente IA (item avulso, fora dos grupos) -->
+                <button
+                    @click="currentTab = 'assistente'"
+                    class="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 group/item"
+                    :class="currentTab === 'assistente'
+                        ? `${accentBgBase} font-medium shadow-sm`
+                        : 'hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black text-slate-600 dark:text-slate-300 hc:text-white'"
+                >
+                    <i class="ph ph-sparkle text-xl transition-transform duration-200 group-hover/item:scale-110" :class="currentTab === 'assistente' ? 'ph-fill' : ''"></i>
+                    <span class="ml-3">Assistente IA</span>
+                </button>
             </nav>
 
-            <div class="p-4 border-t border-slate-100 dark:border-slate-800 hc:border-white">
-                <a href="perfil-visualizar.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black transition cursor-pointer group block">
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 hc:border-white relative" x-data="{ profileMenuOpen: false }" @click.outside="profileMenuOpen = false">
+                <button
+                    @click="profileMenuOpen = !profileMenuOpen"
+                    class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black transition cursor-pointer group"
+                >
                     <div class="w-10 h-10 rounded-full bg-blue-600 hc:bg-yellow-400 hc:text-black text-white flex items-center justify-center text-sm font-bold border-2 border-transparent group-hover:border-slate-300 hc:border-white flex-shrink-0" x-text="nome ? nome.charAt(0).toUpperCase() : '?'"></div>
-                    <div>
-                        <p class="text-sm font-semibold text-slate-900 dark:text-white" x-text="nome || 'Carregando...'"></p>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 group-hover:text-current group-[.hc]:text-yellow-300" x-text="email"></p>
+                    <div class="flex-1 min-w-0 text-left">
+                        <p class="text-sm font-semibold text-slate-900 dark:text-white truncate" x-text="nome || 'Carregando...'"></p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 group-hover:text-current group-[.hc]:text-yellow-300 truncate" x-text="email"></p>
                     </div>
-                </a>
+                    <i class="ph-bold ph-caret-up text-sm text-slate-400 hc:text-white transition-transform duration-200 flex-shrink-0" :class="profileMenuOpen ? '' : 'rotate-180'"></i>
+                </button>
+
+                <!-- Dropdown do Perfil -->
+                <div
+                    x-show="profileMenuOpen"
+                    x-transition:enter="transition ease-out duration-150"
+                    x-transition:enter-start="opacity-0 translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-cloak
+                    class="absolute bottom-full left-4 right-4 mb-2 bg-white dark:bg-slate-800 hc:bg-black hc:border-2 hc:border-white rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden z-30"
+                >
+                    <button
+                        @click="currentTab = 'settings'; profileMenuOpen = false"
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hc:text-white hover:bg-slate-100 dark:hover:bg-slate-700 hc:hover:bg-white hc:hover:text-black transition"
+                    >
+                        <i class="ph ph-gear text-base"></i> Configurações
+                    </button>
+                    <a
+                        href="editar-dados.html"
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hc:text-white hover:bg-slate-100 dark:hover:bg-slate-700 hc:hover:bg-white hc:hover:text-black transition"
+                    >
+                        <i class="ph ph-user-circle-gear text-base"></i> Editar dados
+                    </a>
+                    <a
+                        href="perfil-visualizar.html"
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hc:text-white hover:bg-slate-100 dark:hover:bg-slate-700 hc:hover:bg-white hc:hover:text-black transition"
+                    >
+                        <i class="ph ph-graduation-cap text-base"></i> Perfil Acadêmico
+                    </a>
+                    <div class="border-t border-slate-100 dark:border-slate-700 hc:border-white"></div>
+                    <button
+                        @click="sair"
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hc:text-white hover:bg-red-50 dark:hover:bg-red-900/20 hc:hover:bg-white hc:hover:text-black transition"
+                    >
+                        <i class="ph-bold ph-sign-out text-base"></i> Sair
+                    </button>
+                </div>
             </div>
-            <button
-                            @click="sair"
-                            class="w-full flex items-center gap-3 p-3 rounded-xl text-red-600 dark:text-red-400 hc:text-white hover:bg-red-50 dark:hover:bg-red-900/20 hc:hover:bg-white hc:hover:text-black transition"
-                        >
-                            <i class="ph-bold ph-sign-out text-lg"></i>
-                            <span class="text-sm font-medium">Sair</span>
-                        </button>
         </aside>
 
         <!-- MAIN CONTENT -->
@@ -115,6 +193,112 @@
                     <i class="ph ph-list text-2xl"></i>
                 </button>
             </header>
+
+            <!-- MENU MOBILE (Off-canvas) -->
+            <div x-show="mobileMenuOpen" x-cloak class="md:hidden fixed inset-0 z-40">
+                <!-- Fundo escurecido -->
+                <div
+                    @click="mobileMenuOpen = false"
+                    x-show="mobileMenuOpen"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="absolute inset-0 bg-black/50"
+                ></div>
+
+                <!-- Painel lateral -->
+                <div
+                    x-show="mobileMenuOpen"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 -translate-x-4"
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 translate-x-0"
+                    x-transition:leave-end="opacity-0 -translate-x-4"
+                    class="absolute left-0 top-0 h-full w-72 max-w-[85%] bg-white dark:bg-slate-900 hc:bg-black hc:border-r-2 hc:border-white flex flex-col min-h-0"
+                >
+                    <div class="h-16 flex items-center justify-between px-5 border-b border-slate-100 dark:border-slate-800 hc:border-white flex-shrink-0">
+                        <img src="img/horizontallogotransline.png" alt="Rota Do Sucesso" class="h-10 w-auto object-contain">
+                        <button @click="mobileMenuOpen = false" class="text-slate-500 dark:text-slate-300 hc:text-white">
+                            <i class="ph ph-x text-2xl"></i>
+                        </button>
+                    </div>
+
+                    <!-- Atalhos -->
+                    <div class="px-4 pt-4 flex-shrink-0">
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button @click="currentTab = 'dashboard'; mobileMenuOpen = false" class="flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black text-slate-600 dark:text-slate-300 hc:text-white">
+                                <i class="ph-bold ph-house text-lg"></i>
+                                <span class="text-[10px] font-semibold">Home</span>
+                            </button>
+                            <a href="perfil-visualizar.html" class="flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black text-slate-600 dark:text-slate-300 hc:text-white">
+                                <i class="ph-bold ph-pencil-simple text-lg"></i>
+                                <span class="text-[10px] font-semibold">Editar Perfil</span>
+                            </a>
+                            <button @click="sair" class="flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 hc:hover:bg-white hc:hover:text-black text-red-600 dark:text-red-400 hc:text-white">
+                                <i class="ph-bold ph-sign-out text-lg"></i>
+                                <span class="text-[10px] font-semibold">Sair</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Navegação agrupada -->
+                    <nav class="flex-1 min-h-0 py-5 px-4 space-y-5 overflow-y-auto">
+                        <template x-for="group in menuGroups" :key="group.id">
+                            <div>
+                                <p class="px-3 mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hc:text-yellow-300 flex items-center gap-1.5">
+                                    <i :class="`ph-bold ph-${group.icon}`"></i>
+                                    <span x-text="group.label"></span>
+                                </p>
+                                <div class="space-y-1">
+                                    <template x-for="item in group.items" :key="item.id">
+                                        <button
+                                            @click="currentTab = item.id; mobileMenuOpen = false"
+                                            class="w-full flex items-center pl-7 pr-4 py-2.5 rounded-xl transition-all duration-200 text-sm"
+                                            :class="currentTab === item.id
+                                                ? `${accentBgBase} font-medium shadow-sm`
+                                                : 'hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black text-slate-600 dark:text-slate-300 hc:text-white'"
+                                        >
+                                            <i :class="`ph ph-${item.icon} text-base`" :class="currentTab === item.id ? 'ph-fill' : ''"></i>
+                                            <span class="ml-3" x-text="item.label"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <button
+                            @click="currentTab = 'assistente'; mobileMenuOpen = false"
+                            class="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200"
+                            :class="currentTab === 'assistente'
+                                ? `${accentBgBase} font-medium shadow-sm`
+                                : 'hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black text-slate-600 dark:text-slate-300 hc:text-white'"
+                        >
+                            <i class="ph ph-sparkle text-xl" :class="currentTab === 'assistente' ? 'ph-fill' : ''"></i>
+                            <span class="ml-3">Assistente IA</span>
+                        </button>
+                    </nav>
+
+                    <!-- Perfil -->
+                    <div class="p-4 border-t border-slate-100 dark:border-slate-800 hc:border-white space-y-1 flex-shrink-0">
+                        <button @click="currentTab = 'settings'; mobileMenuOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 dark:text-slate-200 hc:text-white hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black transition">
+                            <i class="ph ph-gear text-base"></i> Configurações
+                        </button>
+                        <a href="editar-dados.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 dark:text-slate-200 hc:text-white hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black transition">
+                            <i class="ph ph-user-circle-gear text-base"></i> Editar dados
+                        </a>
+                        <a href="perfil-visualizar.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 dark:text-slate-200 hc:text-white hover:bg-slate-100 dark:hover:bg-slate-800 hc:hover:bg-white hc:hover:text-black transition">
+                            <i class="ph ph-graduation-cap text-base"></i> Perfil Acadêmico
+                        </a>
+                        <button @click="sair" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hc:text-white hover:bg-red-50 dark:hover:bg-red-900/20 hc:hover:bg-white hc:hover:text-black transition">
+                            <i class="ph-bold ph-sign-out text-base"></i> Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <!-- SCROLLABLE AREA -->
             <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
@@ -666,7 +850,7 @@
                 <!-- CRONOGRAMA PERSONALIZADO TAB -->
                 <div x-show="currentTab === 'cronograma'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-3xl mx-auto space-y-6" x-cloak>
                     <div>
-                        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Cronograma Personalizado</h1>
+                        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Meu Plano de Estudos</h1>
                         <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Responda com sinceridade — quanto mais realista, melhor o plano fica.</p>
                     </div>
 
@@ -867,19 +1051,19 @@
                                 <i class="ph-fill ph-moon-stars" :class="accentText"></i> Aparência (Contraste e Tema)
                             </h2>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <button @click="theme = 'light'" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'light' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
+                                <button @click="alterarTema('light')" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'light' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
                                     <i class="ph-bold ph-sun text-3xl"></i>
                                     <span class="font-medium">Claro</span>
                                 </button>
-                                <button @click="theme = 'dark'" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'dark' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
+                                <button @click="alterarTema('dark')" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'dark' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
                                     <i class="ph-bold ph-moon text-3xl"></i>
                                     <span class="font-medium">Escuro</span>
                                 </button>
-                                <button @click="theme = 'auto'" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'auto' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
+                                <button @click="alterarTema('auto')" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'auto' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
                                     <i class="ph-bold ph-desktop text-3xl"></i>
                                     <span class="font-medium">Sistema</span>
                                 </button>
-                                <button @click="theme = 'hc'" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'hc' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
+                                <button @click="alterarTema('hc')" class="p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3" :class="theme === 'hc' ? accentBgBase : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 hc:border-white hc:text-white hc:hover:border-yellow-400 text-slate-700 dark:text-slate-200'">
                                     <i class="ph-bold ph-circle-half-tilt text-3xl"></i>
                                     <span class="font-medium">Alto Contraste</span>
                                 </button>
@@ -940,6 +1124,296 @@
                     </div>
                 </div>
 
+                <!-- ROTINA DIÁRIA TAB -->
+                <div x-show="currentTab === 'rotina'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-4xl mx-auto space-y-6" x-cloak>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Rotina Diária (REPRESENTAÇAO VISUAL)</h1>
+                        <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Uma prévia de como seus horários fixos poderão aparecer aqui.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center" :class="accentBgBase">
+                                    <i class="ph-bold ph-sun text-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-yellow-300">Hoje</p>
+                                    <h3 class="font-bold text-slate-900 dark:text-white">Quarta-feira</h3>
+                                </div>
+                            </div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300">3 compromissos planejados</p>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-yellow-300 mb-1">Tempo reservado</p>
+                            <p class="text-2xl font-extrabold text-slate-900 dark:text-white">4h 30m</p>
+                            <div class="mt-3 h-2 rounded-full bg-slate-100 dark:bg-slate-800 hc:bg-gray-800 overflow-hidden">
+                                <div class="h-full rounded-full" :class="accentBg" style="width: 68%"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-yellow-300 mb-1">Próximo bloco</p>
+                            <p class="text-lg font-bold text-slate-900 dark:text-white">Matemática</p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300">14:00 · 1h 30m</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Agenda de hoje</h3>
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full" :class="accentBgBase">Prévia</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 hc:bg-transparent hc:border hc:border-gray-700">
+                                <span class="w-14 text-sm font-bold text-slate-600 dark:text-slate-300 hc:text-white">08:00</span>
+                                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center">
+                                    <i class="ph-fill ph-coffee"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-slate-900 dark:text-white">Rotina pessoal</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300">08:00 – 09:00</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 hc:bg-transparent hc:border hc:border-gray-700">
+                                <span class="w-14 text-sm font-bold text-slate-600 dark:text-slate-300 hc:text-white">14:00</span>
+                                <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 flex items-center justify-center">
+                                    <i class="ph-fill ph-function"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-slate-900 dark:text-white">Matemática</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300">Cálculo Diferencial · 1h 30m</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 hc:bg-transparent hc:border hc:border-gray-700">
+                                <span class="w-14 text-sm font-bold text-slate-600 dark:text-slate-300 hc:text-white">17:00</span>
+                                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 flex items-center justify-center">
+                                    <i class="ph-fill ph-cards"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-slate-900 dark:text-white">Revisão</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300">Revisão geral · 45m</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DICAS DE ESTUDO TAB -->
+                <div x-show="currentTab === 'dicas'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-5xl mx-auto space-y-6" x-cloak>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Dicas de Estudo (REPRESENTAÇÃO VISUAL)</h1>
+                        <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Uma prévia da biblioteca de técnicas que poderá ser acessada pelo menu.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4" :class="accentBgBase">
+                                <i class="ph-fill ph-timer text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-1">Pomodoro</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300">Divida o estudo em blocos de foco e pequenas pausas para manter a concentração.</p>
+                            <span class="inline-block mt-4 text-xs font-semibold px-2.5 py-1 rounded-full" :class="accentBgBase">5 min de leitura</span>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4 bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+                                <i class="ph-fill ph-repeat text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-1">Revisão espaçada</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300">Revisite os conteúdos em intervalos planejados para reforçar a memória.</p>
+                            <span class="inline-block mt-4 text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">Método</span>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4 bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                                <i class="ph-fill ph-brain text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-1">Recordação ativa</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300">Tente recuperar a informação sem consultar o material antes de conferir a resposta.</p>
+                            <span class="inline-block mt-4 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">Técnica</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="ph-fill ph-sparkle text-xl" :class="accentText"></i>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Dica do dia</h3>
+                        </div>
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 hc:bg-transparent hc:border hc:border-dashed hc:border-gray-600">
+                            <p class="font-semibold text-slate-900 dark:text-white">Antes de começar, defina uma tarefa pequena e específica.</p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 mt-1">Em vez de “estudar matemática”, experimente “resolver 5 exercícios de funções”.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VÍDEOS DOS PROFESSORES TAB -->
+                <div x-show="currentTab === 'videos'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-5xl mx-auto space-y-6" x-cloak>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Vídeos dos Professores (REPRESENTAÇÃO VISUAL)</h1>
+                        <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Uma prévia da futura biblioteca de videoaulas.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <div class="h-36 bg-gradient-to-br from-blue-500 to-blue-800 flex items-center justify-center relative">
+                                <i class="ph-fill ph-play-circle text-5xl text-white"></i>
+                                <span class="absolute top-3 left-3 text-xs font-bold px-2 py-1 rounded-lg bg-black/40 text-white">Matemática</span>
+                                <span class="absolute bottom-3 right-3 text-xs font-semibold px-2 py-1 rounded-lg bg-black/50 text-white">18:42</span>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-slate-900 dark:text-white">Funções: introdução</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300 mt-1">Professor demonstrativo · Matemática</p>
+                                <button class="mt-4 w-full py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 hc:border-white text-slate-700 dark:text-slate-200 hc:text-white">Visualizar aula</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <div class="h-36 bg-gradient-to-br from-purple-500 to-purple-800 flex items-center justify-center relative">
+                                <i class="ph-fill ph-play-circle text-5xl text-white"></i>
+                                <span class="absolute top-3 left-3 text-xs font-bold px-2 py-1 rounded-lg bg-black/40 text-white">Física</span>
+                                <span class="absolute bottom-3 right-3 text-xs font-semibold px-2 py-1 rounded-lg bg-black/50 text-white">24:10</span>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-slate-900 dark:text-white">Cinemática básica</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300 mt-1">Professor demonstrativo · Física</p>
+                                <button class="mt-4 w-full py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 hc:border-white text-slate-700 dark:text-slate-200 hc:text-white">Visualizar aula</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <div class="h-36 bg-gradient-to-br from-amber-500 to-orange-700 flex items-center justify-center relative">
+                                <i class="ph-fill ph-play-circle text-5xl text-white"></i>
+                                <span class="absolute top-3 left-3 text-xs font-bold px-2 py-1 rounded-lg bg-black/40 text-white">História</span>
+                                <span class="absolute bottom-3 right-3 text-xs font-semibold px-2 py-1 rounded-lg bg-black/50 text-white">15:27</span>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-slate-900 dark:text-white">Revolução Industrial</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-gray-300 mt-1">Professor demonstrativo · História</p>
+                                <button class="mt-4 w-full py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 hc:border-white text-slate-700 dark:text-slate-200 hc:text-white">Visualizar aula</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROGRESSO TAB -->
+                <div x-show="currentTab === 'progresso'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-5xl mx-auto space-y-6" x-cloak>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Progresso (REPRESENTAÇÃO VISUAL)</h1>
+                        <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Uma visão visual de como seu desempenho poderá ser acompanhado.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-yellow-300">Conteúdos concluídos</p>
+                            <p class="text-3xl font-extrabold mt-1 text-slate-900 dark:text-white">38</p>
+                            <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">+6 esta semana</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-yellow-300">Horas estudadas</p>
+                            <p class="text-3xl font-extrabold mt-1 text-slate-900 dark:text-white">24h</p>
+                            <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">Meta semanal: 30h</p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 hc:text-yellow-300">Sequência atual</p>
+                            <p class="text-3xl font-extrabold mt-1 text-slate-900 dark:text-white">12 dias</p>
+                            <p class="text-xs text-orange-500 mt-1"><i class="ph-fill ph-fire"></i> Continue estudando</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-5">Progresso por disciplina</h3>
+                        <div class="space-y-5">
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="font-semibold text-slate-700 dark:text-slate-200 hc:text-white">Matemática</span><span class="font-bold text-slate-500 dark:text-slate-400 hc:text-yellow-300">72%</span>
+                                </div>
+                                <div class="h-3 rounded-full bg-slate-100 dark:bg-slate-800 hc:bg-gray-800 overflow-hidden"><div class="h-full rounded-full" :class="accentBg" style="width:72%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="font-semibold text-slate-700 dark:text-slate-200 hc:text-white">Física</span><span class="font-bold text-slate-500 dark:text-slate-400 hc:text-yellow-300">48%</span>
+                                </div>
+                                <div class="h-3 rounded-full bg-slate-100 dark:bg-slate-800 hc:bg-gray-800 overflow-hidden"><div class="h-full rounded-full bg-purple-500" style="width:48%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="font-semibold text-slate-700 dark:text-slate-200 hc:text-white">História</span><span class="font-bold text-slate-500 dark:text-slate-400 hc:text-yellow-300">83%</span>
+                                </div>
+                                <div class="h-3 rounded-full bg-slate-100 dark:bg-slate-800 hc:bg-gray-800 overflow-hidden"><div class="h-full rounded-full bg-amber-500" style="width:83%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="font-semibold text-slate-700 dark:text-slate-200 hc:text-white">Geografia</span><span class="font-bold text-slate-500 dark:text-slate-400 hc:text-yellow-300">95%</span>
+                                </div>
+                                <div class="h-3 rounded-full bg-slate-100 dark:bg-slate-800 hc:bg-gray-800 overflow-hidden"><div class="h-full rounded-full bg-emerald-500" style="width:95%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- METAS TAB -->
+                <div x-show="currentTab === 'metas'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-5xl mx-auto space-y-6" x-cloak>
+                    <div>
+                        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white">Metas Representação Visual</h1>
+                        <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">Uma prévia de como seus objetivos poderão ser acompanhados.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hc:text-yellow-300">Meta semanal</span>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-1">Estudar 30 horas</h3>
+                                </div>
+                                <div class="w-11 h-11 rounded-xl flex items-center justify-center" :class="accentBgBase">
+                                    <i class="ph-fill ph-clock text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-sm mt-6 mb-2">
+                                <span class="text-slate-500 dark:text-slate-400 hc:text-gray-300">24h de 30h</span>
+                                <strong class="text-slate-900 dark:text-white">80%</strong>
+                            </div>
+                            <div class="h-3 rounded-full bg-slate-100 dark:bg-slate-800 hc:bg-gray-800 overflow-hidden">
+                                <div class="h-full rounded-full" :class="accentBg" style="width:80%"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white shadow-sm">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hc:text-yellow-300">Objetivo</span>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-1">Concluir 10 tópicos</h3>
+                                </div>
+                                <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 flex items-center justify-center">
+                                    <i class="ph-fill ph-check-circle text-xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-sm mt-6 mb-2">
+                                <span class="text-slate-500 dark:text-slate-400 hc:text-gray-300">7 de 10 tópicos</span>
+                                <strong class="text-slate-900 dark:text-white">70%</strong>
+                            </div>
+                            <div class="h-3 rounded-full bg-slate-100 dark:bg-slate-800 hc:bg-gray-800 overflow-hidden">
+                                <div class="h-full rounded-full bg-emerald-500" style="width:70%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-dashed border-slate-300 dark:border-slate-700 hc:bg-black hc:border-white shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hc:bg-transparent hc:border hc:border-white flex items-center justify-center">
+                                    <i class="ph-bold ph-plus text-lg text-slate-500 dark:text-slate-300 hc:text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-slate-900 dark:text-white">Nova meta</p>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300">Aqui poderá ser criado outro objetivo de estudo.</p>
+                                </div>
+                            </div>
+                            <button class="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 hc:border-white text-slate-700 dark:text-slate-200 hc:text-white">Adicionar meta</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -953,7 +1427,14 @@
         usuarioId: null,
         nome: '',
         email: '',
-        theme: localStorage.getItem('theme') || 'light',
+        theme: (() => {
+            try {
+                const salvo = localStorage.getItem('theme');
+                return ['light', 'dark', 'auto', 'hc'].includes(salvo) ? salvo : 'light';
+            } catch (e) {
+                return 'light';
+            }
+        })(),
         isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
         accentColor: localStorage.getItem('accentColor') || 'blue', 
         selectedSubject: 'Matemática',
@@ -1195,13 +1676,23 @@
         isTimerRunning: false,
         timerInterval: null,
 
+        alterarTema(novoTema) {
+            const temasValidos = ['light', 'dark', 'auto', 'hc'];
+            if (!temasValidos.includes(novoTema)) return;
+
+            this.theme = novoTema;
+
+            // Salva imediatamente a escolha para permanecer após fechar/reabrir a página.
+            try {
+                localStorage.setItem('theme', novoTema);
+            } catch (e) {
+                // O watcher abaixo continua mantendo o estado da aplicação mesmo sem localStorage.
+            }
+        },
+
         initApp() {
             // Exige login — sem usuarioId salvo, volta para a tela de entrada.
-            const usuarioId = sessionStorage.getItem('usuarioId');
-            if (!usuarioId) {
-                window.location.href = 'login.html';
-                return;
-            }
+            
             this.usuarioId = usuarioId;
             this.carregarUsuario();
             this.carregarSugestaoIA();
@@ -1210,9 +1701,17 @@
 
             this.timeLeft = this.pomodoroTime * 60;
             
-            // Monitora e salva automaticamente as preferências quando alteradas
-            this.$watch('theme', value => localStorage.setItem('theme', value));
-            this.$watch('accentColor', value => localStorage.setItem('accentColor', value));
+            // Monitora e salva automaticamente as preferências quando alteradas.
+            this.$watch('theme', value => {
+                try {
+                    localStorage.setItem('theme', value);
+                } catch (e) {}
+            });
+            this.$watch('accentColor', value => {
+                try {
+                    localStorage.setItem('accentColor', value);
+                } catch (e) {}
+            });
         },
 
         sair() {
@@ -1503,16 +2002,50 @@
             { id: '4', label: 'Madrugada' },
         ],
 
-        menuItems: [
-            { id: 'dashboard', label: 'Dashboard', icon: 'squares-four' },
-            { id: 'timer', label: 'Foco & Timer', icon: 'timer' },
-            { id: 'tasks', label: 'Tarefas', icon: 'check-square-offset' },
-            { id: 'calendar', label: 'Calendário', icon: 'calendar-blank' },
-            { id: 'subjects', label: 'Matérias', icon: 'books' },
-            { id: 'stats', label: 'Estatísticas', icon: 'chart-line-up' },
-            { id: 'cronograma', label: 'Cronograma', icon: 'calendar-check' },
-            { id: 'assistente', label: 'Assistente IA', icon: 'sparkle' },
-            { id: 'settings', label: 'Configurações', icon: 'gear' },
+        // Navegação principal, reorganizada em categorias na linguagem do estudante.
+        // "Assistente IA" fica fora dos grupos (item avulso) e "Configurações" saiu
+        // do menu principal — agora só aparece no dropdown do perfil.
+        menuGroups: [
+            {
+                id: 'rota',
+                label: 'Minha Rota',
+                icon: 'map-pin',
+                items: [
+                    { id: 'dashboard', label: 'Hoje', icon: 'sun' },
+                    { id: 'rotina', label: 'Rotina diária', icon: 'calendar-check' },
+                    { id: 'cronograma', label: 'Plano de estudos', icon: 'map-trifold' },
+                ]
+            },
+            {
+                id: 'foco',
+                label: 'Foco',
+                icon: 'target',
+                items: [
+                    { id: 'timer', label: 'Timer', icon: 'timer' },
+                    { id: 'tasks', label: 'Tarefas', icon: 'check-square-offset' },
+                    { id: 'calendar', label: 'Calendário', icon: 'calendar-blank' },
+                ]
+            },
+            {
+                id: 'aprender',
+                label: 'Aprender',
+                icon: 'book-open-text',
+                items: [
+                    { id: 'subjects', label: 'Disciplinas', icon: 'books' },
+                    { id: 'dicas', label: 'Dicas de estudo', icon: 'lightbulb' },
+                    { id: 'videos', label: 'Vídeos dos professores', icon: 'video-camera' },
+                ]
+            },
+            {
+                id: 'evolucao',
+                label: 'Minha Evolução',
+                icon: 'chart-line-up',
+                items: [
+                    { id: 'progresso', label: 'Progresso', icon: 'gauge' },
+                    { id: 'stats', label: 'Estatísticas', icon: 'chart-bar' },
+                    { id: 'metas', label: 'Metas', icon: 'flag-checkered' },
+                ]
+            },
         ],
 
         schedule: [
