@@ -1691,8 +1691,15 @@
         },
 
         initApp() {
-            // Exige login — sem usuarioId salvo, volta para a tela de entrada.
-            
+            // Recupera o ID salvo pelo login.
+            const usuarioId = sessionStorage.getItem('usuarioId');
+
+            // Sem login, não permite acessar o dashboard.
+            if (!usuarioId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
             this.usuarioId = usuarioId;
             this.carregarUsuario();
             this.carregarSugestaoIA();
