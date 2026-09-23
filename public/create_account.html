@@ -110,7 +110,32 @@
 
             <!-- Formulário Principal -->
             <div class="w-full max-w-md mx-auto my-auto py-8">
-                
+
+                <!-- Indicador de Etapas -->
+                <div class="w-full mb-8" role="group" aria-label="Progresso do cadastro">
+                    <ol class="flex items-center">
+                        <!-- Etapa 1: Conta (atual) -->
+                        <li class="flex items-center text-slate-800 dark:text-white hc:text-white" aria-current="step">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 hc:bg-yellow-400 ring-4 ring-blue-100 dark:ring-blue-900/50 hc:ring-0 text-white hc:text-black text-xs font-bold shrink-0">1</div>
+                            <span class="ml-2 text-xs font-semibold hidden sm:inline whitespace-nowrap">Conta</span>
+                        </li>
+                        <li class="flex-1 h-0.5 mx-2 sm:mx-3 bg-slate-200 dark:bg-slate-800 hc:bg-white/30" aria-hidden="true"></li>
+
+                        <!-- Etapa 2: Perfil Acadêmico (pendente) -->
+                        <li class="flex items-center text-slate-400 dark:text-slate-500 hc:text-gray-400">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 hc:bg-black hc:border hc:border-white/40 text-slate-400 dark:text-slate-500 hc:text-gray-400 text-xs font-bold shrink-0">2</div>
+                            <span class="ml-2 text-xs font-medium hidden sm:inline whitespace-nowrap">Perfil Acadêmico</span>
+                        </li>
+                        <li class="flex-1 h-0.5 mx-2 sm:mx-3 bg-slate-200 dark:bg-slate-800 hc:bg-white/30" aria-hidden="true"></li>
+
+                        <!-- Etapa 3: Concluir (pendente) -->
+                        <li class="flex items-center text-slate-400 dark:text-slate-500 hc:text-gray-400">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 hc:bg-black hc:border hc:border-white/40 text-slate-400 dark:text-slate-500 hc:text-gray-400 text-xs font-bold shrink-0">3</div>
+                            <span class="ml-2 text-xs font-medium hidden sm:inline whitespace-nowrap">Concluir</span>
+                        </li>
+                    </ol>
+                </div>
+
                 <!-- Cabeçalho -->
                 <div class="mb-8">
                     <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Criar sua conta</h2>
