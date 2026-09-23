@@ -1929,6 +1929,17 @@
             }
         },
 
+        async init() {
+                    const usuarioId = sessionStorage.getItem('usuarioId');
+                    if (!usuarioId) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    this.usuarioId = usuarioId;
+                    this.diasOptions.forEach(d => this.adicionarLinha(d.id));
+                    await this.carregarCronograma();
+                },
+
         startTimer() {
             this.isTimerRunning = true;
             this.timerInterval = setInterval(() => {
@@ -2077,6 +2088,8 @@
             { day: 'Dom', hours: 0.0 }
         ]
     }
+
+                
 }
      </script>   
 </body>
