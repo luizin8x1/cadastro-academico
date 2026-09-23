@@ -10,3 +10,58 @@
 .hc ::-webkit-scrollbar { width: 8px; }
 .hc ::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 0; border: 1px solid #000; }
 .hc ::-webkit-scrollbar-track { background: #000000; border-left: 1px solid #333; }
+
+/* ==========================================================================
+   Animações de entrada (página inicial)
+   ========================================================================== */
+
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    will-change: opacity, transform;
+}
+.reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+.reveal-delay-1.revealed { transition-delay: 0.05s; }
+.reveal-delay-2.revealed { transition-delay: 0.15s; }
+.reveal-delay-3.revealed { transition-delay: 0.25s; }
+.reveal-delay-4.revealed { transition-delay: 0.35s; }
+
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 35px -15px rgba(37, 99, 235, 0.25);
+}
+
+@keyframes pulseSlow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+}
+.animate-pulse-slow {
+    animation: pulseSlow 6s ease-in-out infinite;
+}
+
+/* Respeita usuários que preferem menos movimento */
+@media (prefers-reduced-motion: reduce) {
+    .reveal, .hover-lift, .animate-pulse-slow {
+        animation: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+/* Justifica textos alinhados à esquerda/direita, mantendo os textos centralizados */
+p {
+    text-align: justify;
+}
+
+.text-center p,
+p.text-center {
+    text-align: center !important;
+}
