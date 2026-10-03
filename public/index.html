@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR" :class="{ 'dark': isDarkClass, 'hc': theme === 'hc' }" x-data="homeApp()">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Do sucesso - Transforme sua rotina de estudos</title>
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="img/favicon1.png">
+    <link rel="stylesheet" href="stylelogin.css">
+    <link rel="stylesheet" href="styleinicial.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Configuração Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', 800: '#1e293b', 900: '#0f172a', 950: '#020617'
+                        }
+                    }
+                }
+            },
+            plugins: [
+                function({ addVariant }) {
+                    addVariant('hc', 'html.hc &');
+                }
+            ]
+        }
+    </script>
+</head>
+<body 
+    class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-200 selection:text-blue-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100 hc:bg-black hc:text-white min-h-screen flex flex-col justify-between"
+>
+    <!-- NAV BAR SUPERIOR -->
+    <header class="w-full bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 dark:from-slate-950 dark:via-blue-950 dark:to-slate-950 hc:bg-black hc:bg-none hc:border-b-2 hc:border-white shadow-lg sticky top-0 z-50 text-white transition-colors duration-300">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+            
+            <!-- Logo em destaque -->
+            <a href="index.html" class="flex items-center group">
+                <img src="img/logo_1.png" alt="Rota Do Sucesso" class="h-14 sm:h-20 w-auto object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)] transition-transform duration-300 group-hover:scale-105">
+            </a>
+
+            <!-- Ações Direita -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                <!-- Seletor Rápido de Tema -->
+                <div class="hidden sm:flex items-center gap-1 bg-white/10 dark:bg-slate-900 hc:bg-black hc:border-2 hc:border-white p-1 rounded-xl border border-white/20 dark:border-slate-800 backdrop-blur-sm">
+                    <button @click="theme = 'light'" :class="theme === 'light' ? 'bg-white text-blue-600 shadow-sm' : 'text-blue-100 dark:text-slate-400 hc:text-white'" class="p-1.5 rounded-lg text-sm transition-all" title="Tema Claro">
+                        <i class="ph-bold ph-sun"></i>
+                    </button>
+                    <button @click="theme = 'dark'" :class="theme === 'dark' ? 'bg-slate-800 text-blue-400 shadow-sm' : 'text-blue-100 dark:text-slate-400 hc:text-white'" class="p-1.5 rounded-lg text-sm transition-all" title="Tema Escuro">
+                        <i class="ph-bold ph-moon"></i>
+                    </button>
+                    <button @click="theme = 'hc'" :class="theme === 'hc' ? 'bg-yellow-400 text-black font-bold' : 'text-blue-100 dark:text-slate-400'" class="p-1.5 rounded-lg text-sm transition-all" title="Alto Contraste">
+                        <i class="ph-bold ph-circle-half-tilt"></i>
+                    </button>
+                </div>
+
+                <!-- Botões de Acesso -->
+               <a href="create_account.html" class="py-2 px-3 sm:px-4 bg-white text-blue-700 hover:bg-blue-50 dark:bg-blue-600 dark:hover:bg-blue-500 dark:text-white hc:bg-yellow-400 hc:hover:bg-yellow-300 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 font-semibold text-xs sm:text-sm rounded-xl shadow-sm transition-all hover:-translate-y-0.5 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
+                    <span>Criar conta</span>
+                    <i class="ph-bold ph-arrow-right"></i>
+                </a>
+
+                <a href="login.html"
+                    class="px-5 py-2.5 rounded-xl
+                    bg-amber-400 text-slate-900 font-bold
+                    border border-amber-300
+                    hover:bg-amber-300
+                    hover:scale-105
+                    shadow-md
+                    transition-all duration-300
+                    flex items-center gap-2">
+                    <i class="ph ph-sign-in"></i>
+                Entrar
+                </a>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1">
+        
+        <!-- HERO SECTION COM IMAGEM DE FUNDO -->
+        <section class="relative overflow-hidden pt-8 pb-16 lg:pt-10 lg:pb-24 px-6 bg-cover bg-center bg-no-repeat" style="background-image: url('img/placeholder.png');">
+            
+            <!-- Máscara/Overlay para garantir boa leitura dos textos sobre a imagem -->
+            <div class="absolute inset-0 bg-slate-50/85 dark:bg-slate-950/85 hc:bg-black transition-colors duration-300"></div>
+
+            <!-- Gradientes Decorativos animados (escondidos no HC) -->
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-blue-600/15 rounded-full blur-3xl pointer-events-none hc:hidden animate-pulse-slow"></div>
+            <div class="absolute top-1/3 -right-32 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none hc:hidden animate-pulse-slow" style="animation-delay: 1.5s;"></div>
+            
+            <div class="max-w-6xl mx-auto text-center relative z-10">
+                <span class="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-100/90 dark:bg-blue-950/80 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hc:bg-yellow-400 hc:text-black hc:font-bold hc:border-yellow-400 mb-6 backdrop-blur-sm">
+                    <i class="ph-bold ph-map-trifold"></i> SUA ROTA, PLANEJADA POR IA
+                </span>
+                
+                <h1 class="reveal reveal-delay-1 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white hc:text-white mb-6 leading-tight max-w-4xl mx-auto">
+                    Organize sua rotina e trace a <span class="text-blue-600 dark:text-blue-400 hc:text-yellow-300">rota certa</span> até a sua aprovação.
+                </h1>
+                
+                <p class="reveal reveal-delay-2 text-lg sm:text-xl text-slate-600 dark:text-slate-300 hc:text-white max-w-2xl mx-auto mb-10 leading-relaxed">
+                    Nossa IA analisa seu perfil, seus objetivos e sua rotina para criar um plano de estudos personalizado — e ajustá-lo conforme você evolui.
+                </p>
+
+                <!-- PAINÉIS COM ESTATÍSTICAS REAIS -->
+<div class="reveal reveal-delay-4 relative max-w-5xl mx-auto"
+     x-data="screenCarousel()">
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+
+        <template x-for="(slide, i) in slides" :key="i">
+
+            <div
+                class="bg-white/95 dark:bg-slate-900/95
+                       rounded-2xl border
+                       flex flex-col items-center justify-center
+                       text-center
+                       min-h-[280px]
+                       px-6 py-8
+                       transition-all duration-700 ease-in-out"
+
+                :class="active === i
+                    ? 'scale-125 z-20 border-blue-500 shadow-2xl'
+                    : 'scale-100 z-10 border-slate-200 dark:border-slate-800 shadow-lg opacity-80'"
+            >
+
+                <!-- ÍCONE -->
+                <div
+                    class="w-16 h-16 rounded-2xl
+                           bg-blue-100 dark:bg-blue-950
+                           text-blue-600 dark:text-blue-400
+                           flex items-center justify-center
+                           text-3xl mb-5">
+
+                    <i class="ph-bold" :class="slide.icon"></i>
+
+                </div>
+
+                <!-- NÚMERO PRINCIPAL -->
+                <div
+                    class="text-5xl font-black
+                           text-blue-600 dark:text-blue-400
+                           mb-3"
+                    x-text="slide.numero">
+                </div>
+
+                <!-- TÍTULO -->
+                <h3
+                    class="text-xl font-bold
+                           text-slate-900 dark:text-white
+                           mb-2"
+                    x-text="slide.title">
+                </h3>
+
+                <!-- DESCRIÇÃO -->
+                <p
+                    class="text-sm text-slate-500
+                           dark:text-slate-400"
+                    x-text="slide.desc">
+                </p>
+
+            </div>
+
+        </template>
+
+    </div>
+
+    <!-- BOTÕES ABAIXO DOS PAINÉIS -->
+<div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+
+    <!-- BOTÃO PRINCIPAL - CADASTRO -->
+    <a href="create_account.html"
+       class="px-8 py-4 rounded-xl
+              bg-blue-600 text-white font-bold
+              shadow-lg shadow-blue-500/20
+              hover:bg-blue-700
+              hover:scale-105 hover:shadow-xl
+              transition-all duration-300
+              flex items-center gap-2">
+
+        <span>Comece agora gratuitamente</span>
+        <i class="ph ph-arrow-right"></i>
+    </a>
+
+    <!-- BOTÃO LOGIN -->
+    <a href="login.html"
+       class="px-7 py-4 rounded-xl
+              bg-yellow-400 text-slate-900 font-bold
+              shadow-lg shadow-yellow-500/20
+              hover:bg-yellow-300
+              hover:scale-105 hover:shadow-xl
+              transition-all duration-300
+              flex items-center gap-2">
+
+        <i class="ph ph-sign-in"></i>
+        <span>Já tenho conta</span>
+    </a>
+
+</div>
+
+
+    <!-- INDICADORES -->
+    <div class="flex items-center justify-center gap-2 mt-10">
+
+        <template x-for="(slide, i) in slides" :key="'dot-'+i">
+
+            <button
+                @click="active = i"
+                class="h-2 rounded-full transition-all duration-300"
+                :class="active === i
+                    ? 'w-8 bg-blue-600'
+                    : 'w-2 bg-slate-300 dark:bg-slate-700'"
+                :aria-label="'Ver ' + slide.title">
+            </button>
+
+        </template>
+
+    </div>
+
+</div>
+
+            </div>
+        </section>
+
+        <!-- COMO FUNCIONA / ROTA PERSONALIZADA -->
+        <section class="py-16 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="reveal text-center max-w-2xl mx-auto mb-14">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-400 hc:bg-yellow-400 hc:text-black hc:font-bold mb-4">
+                        <i class="ph-bold ph-compass"></i> Como funciona
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white mb-3">
+                        Sua rotina, organizada em três passos
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300 text-sm sm:text-base">
+                        Do caos da agenda até um plano de estudos claro e sob medida para o seu objetivo.
+                    </p>
+                </div>
+
+                <div class="relative grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Linha conectora (desktop) -->
+                    <div class="hidden md:block absolute top-8 left-[16.5%] right-[16.5%] h-0.5 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200 dark:from-blue-900 dark:via-blue-600 dark:to-blue-900 hc:hidden"></div>
+
+                    <!-- Passo 1 -->
+                    <div class="reveal reveal-delay-1 relative text-center">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-blue-600 hc:bg-yellow-400 hc:text-black hc:border-2 hc:border-yellow-400 text-white flex items-center justify-center text-2xl font-bold mb-5 shadow-lg shadow-blue-600/30 relative z-10">
+                            <i class="ph-bold ph-user-focus"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white hc:text-white mb-2">1. Conte seus objetivos</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                            Diga qual prova quer passar, sua série e sua rotina — o sistema entende seu ponto de partida.
+                        </p>
+                    </div>
+
+                    <!-- Passo 2 -->
+                    <div class="reveal reveal-delay-2 relative text-center">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-blue-600 hc:bg-yellow-400 hc:text-black hc:border-2 hc:border-yellow-400 text-white flex items-center justify-center text-2xl font-bold mb-5 shadow-lg shadow-blue-600/30 relative z-10">
+                            <i class="ph-bold ph-map-trifold"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white hc:text-white mb-2">2. Receba sua rota</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                            Um cronograma personalizado organiza suas disciplinas e prioridades automaticamente.
+                        </p>
+                    </div>
+
+                    <!-- Passo 3 -->
+                    <div class="reveal reveal-delay-3 relative text-center">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-blue-600 hc:bg-yellow-400 hc:text-black hc:border-2 hc:border-yellow-400 text-white flex items-center justify-center text-2xl font-bold mb-5 shadow-lg shadow-blue-600/30 relative z-10">
+                            <i class="ph-bold ph-trophy"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white hc:text-white mb-2">3. Estude com foco</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                            Acompanhe sua evolução, ajuste a rota quando precisar e caminhe direto até a aprovação.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECURSOS / SOBRE O SITE -->
+        <section class="py-16 px-6 bg-slate-100/60 dark:bg-slate-900/40 hc:bg-black hc:border-t-2 hc:border-b-2 hc:border-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="reveal text-center max-w-2xl mx-auto mb-16">
+                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white hc:text-white mb-3">
+                        Tudo o que você precisa para evoluir nos estudos
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300 text-sm sm:text-base">
+                        Ferramentas pensadas para eliminar a procrastinação e otimizar o seu aprendizado diário.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <!-- Card 1 -->
+                    <div class="reveal reveal-delay-1 hover-lift bg-white dark:bg-slate-900 hc:bg-black p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hc:border-2 hc:border-white shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950 hc:bg-yellow-400 hc:text-black text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl font-bold mb-6">
+                                <i class="ph-bold ph-target"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white hc:text-white mb-2">Perfil Personalizado</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                                Monte seu perfil focado nos seus maiores desafios: seja passar no ENEM, vestibulares, concursos ou organizar sua rotina escolar.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="reveal reveal-delay-2 hover-lift bg-white dark:bg-slate-900 hc:bg-black p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hc:border-2 hc:border-white shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950 hc:bg-yellow-400 hc:text-black text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl font-bold mb-6">
+                                <i class="ph-bold ph-timer"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white hc:text-white mb-2">Foco e Produtividade</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                                Cronometre sessões de estudo sem distrações e mantenha o ritmo ideal para absorver conteúdos complexos com facilidade.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="reveal reveal-delay-3 hover-lift bg-white dark:bg-slate-900 hc:bg-black p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hc:border-2 hc:border-white shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950 hc:bg-yellow-400 hc:text-black text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl font-bold mb-6">
+                                <i class="ph-bold ph-chart-line-up"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white hc:text-white mb-2">Acompanhamento</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 hc:text-gray-300 leading-relaxed">
+                                Visualize seu desempenho, gerencie suas disciplinas e saiba exatamente onde direcionar sua energia para conquistar aprovações.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA FINAL -->
+        <section class="py-20 px-6">
+            <div class="reveal max-w-4xl mx-auto bg-gradient-to-br from-slate-900 to-blue-950 dark:from-slate-900 dark:to-slate-950 hc:bg-black hc:bg-none hc:border-2 hc:border-white rounded-3xl p-8 sm:p-12 text-center text-white relative overflow-hidden shadow-2xl">
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl pointer-events-none hc:hidden"></div>
+                <div class="relative z-10">
+                    <h2 class="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Pronto para dar o próximo passo na sua jornada?</h2>
+                    <p class="text-slate-300 hc:text-gray-300 text-base max-w-xl mx-auto mb-8">
+                        Crie sua conta em poucos segundos, defina seus objetivos e descubra sua rota personalizada de estudos.
+                    </p>
+                    <a href="create_account.html" class="inline-flex items-center gap-2 py-3.5 px-8 bg-blue-600 hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-300 hc:text-black hc:font-bold font-medium rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-xl">
+                        <span>Criar minha conta agora</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- RODAPÉ -->
+<footer class="w-full border-t border-slate-200 dark:border-slate-800 hc:border-white
+               bg-white dark:bg-slate-950 hc:bg-black
+               px-6 py-8">
+
+    <!-- CONTAINER DAS 3 SEÇÕES -->
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+
+        <!-- SEÇÃO 1 - IDENTIDADE -->
+        <div class="flex flex-col items-center text-center">
+
+            <img
+                src="img/logo_1.png"
+                alt="Rota do Sucesso"
+                class="h-14 w-auto object-contain mb-2"
+            >
+
+            <p class="max-w-xs text-slate-800 dark:text-slate-200
+                      font-semibold text-sm leading-snug">
+                Sua rota inteligente para aprender, evoluir e alcançar seus objetivos.
+            </p>
+
+        </div>
+
+
+        <!-- SEÇÃO 2 - NAVEGAÇÃO -->
+        <div class="flex flex-col items-center text-center">
+
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white
+                       mb-3 uppercase tracking-wider">
+                Navegação
+            </h4>
+
+            <nav class="flex flex-col gap-2 text-sm">
+
+                <a href="sobre.html#inicio"
+                   class="text-slate-500 dark:text-slate-400
+                          hover:text-blue-600 transition-colors">
+                    Início
+                </a>
+
+                <a href="sobre.html#como-funciona"
+                   class="text-slate-500 dark:text-slate-400
+                          hover:text-blue-600 transition-colors">
+                    Como funciona
+                </a>
+
+                <a href="sobre.html#recursos"
+                   class="text-slate-500 dark:text-slate-400
+                          hover:text-blue-600 transition-colors">
+                    Recursos
+                </a>
+
+                <a href="contato.html"
+                   class="text-slate-500 dark:text-slate-400
+                          hover:text-blue-600 transition-colors">
+                    Contato
+                </a>
+
+            </nav>
+
+        </div>
+
+
+       <!-- SEÇÃO 3 - INSTITUCIONAL -->
+<div class="flex flex-col items-center text-center">
+
+    <h4 class="text-sm font-bold text-slate-900 dark:text-white
+               mb-3 uppercase tracking-wider">
+        Projeto desenvolvido no
+    </h4>
+
+    <img
+        src="img/SESI_logo.png"
+        alt="SESI - Serviço Social da Indústria"
+        class="h-14 w-auto object-contain mb-2"
+    >
+
+    <p class="max-w-xs text-slate-500 dark:text-slate-400
+              text-xs leading-relaxed">
+        Projeto educacional desenvolvido por estudantes do SESI RINALDO CAMPOS SOARES - IPATINGA MG.
+    </p>
+
+</div>
+
+    </div>
+
+</footer>
+
+    <!-- Lógica Alpine.js -->
+    <script>
+        function homeApp() {
+            return {
+                theme: (function(){ try { return localStorage.getItem('user_theme') || 'light'; } catch(e) { return 'light'; } })(),
+                isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+
+                init() {
+                    this.$watch('theme', value => { try { localStorage.setItem('user_theme', value); } catch(e) {} });
+
+                    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    const elementos = document.querySelectorAll('.reveal');
+
+                    if (prefersReducedMotion) {
+                        elementos.forEach(el => el.classList.add('revealed'));
+                        return;
+                    }
+
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('revealed');
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, { threshold: 0.15 });
+
+                    elementos.forEach(el => observer.observe(el));
+                },
+
+                get isDarkClass() {
+                    return this.theme === 'dark';
+                }
+            }
+        }
+
+        function screenCarousel() {
+    return {
+        active: 0,
+        totalUsuarios: 0,
+
+        slides: [
+            {
+                icon: 'ph-users-three',
+                title: 'Nossa comunidade',
+                numero: 0,
+                desc: 'pessoas já fazem parte da nossa rota'
+            },
+            {
+                icon: 'ph-clock',
+                title: 'Horas planejadas',
+                numero: '0h',
+                desc: 'de estudos já planejados pela plataforma'
+            },
+            {
+                icon: 'ph-books',
+                title: 'Conteúdo disponível',
+                numero: '--',
+                desc: 'questões e dicas disponíveis na plataforma'
+            }
+        ],
+
+        async carregarEstatisticas() {
+            try {
+                const resposta = await fetch('/api/estatisticas');
+                const dados = await resposta.json();
+
+                if (dados.sucesso) {
+                    this.totalUsuarios = dados.totalUsuarios;
+
+                     // Painel 1 - usuários cadastrados
+                        this.slides[0].numero = dados.totalUsuarios;
+
+                    // Painel 2 - total de horas planejadas
+                        this.slides[1].numero = dados.horasPlanejadas + 'h';
+                }
+
+            } catch (erro) {
+                console.error('Erro ao carregar estatísticas:', erro);
+            }
+        },
+
+        init() {
+            // Busca os dados reais no banco
+            this.carregarEstatisticas();
+
+            // Muda o painel em destaque a cada 8 segundos
+            setInterval(() => {
+                this.active = (this.active + 1) % this.slides.length;
+            }, 8000);
+        }
+    }
+}
+    </script>
+</body>
+</html>

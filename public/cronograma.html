@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota Do Sucesso - Cronograma Personalizado</title>
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="stylelogin.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Configuração Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', 800: '#1e293b', 900: '#0f172a', 950: '#020617'
+                        }
+                    }
+                }
+            },
+            plugins: [
+                function({ addVariant }) {
+                    addVariant('hc', 'body.hc &');
+                }
+            ]
+        }
+    </script>
+</head>
+<body
+    x-data="cronogramaApp()"
+    :class="{ 'dark': isDarkClass, 'hc': theme === 'hc' }"
+    class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-200 selection:text-blue-900 transition-colors duration-300 hc:bg-black hc:text-white min-h-screen flex"
+>
+    <div class="w-full min-h-screen flex flex-col md:flex-row dark:bg-slate-950 hc:bg-black relative">
+
+        <!-- LADO ESQUERDO: Branding & Visual -->
+        <div class="hidden md:flex md:w-5/12 lg:w-1/2 bg-slate-900 dark:bg-slate-900/50 hc:bg-black hc:border-r-2 hc:border-white relative overflow-hidden flex-col justify-between p-12 text-white border-r border-slate-200/10">
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none hc:hidden"></div>
+            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none hc:hidden"></div>
+
+            <!-- Logo -->
+            <div class="flex items-center gap-3 z-10">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 hc:bg-yellow-400 hc:text-black flex items-center justify-center text-xl font-bold shadow-sm">
+                    <i class="ph-fill ph-graduation-cap"></i>
+                </div>
+                <span class="font-bold text-2xl tracking-tight">Rota Do Sucesso</span>
+            </div>
+
+            <!-- Card de Destaque -->
+            <div class="my-auto z-10 max-w-md">
+                <div class="bg-white/10 dark:bg-slate-800/60 hc:bg-black hc:border-2 hc:border-white glass-panel p-6 rounded-2xl border border-white/10 shadow-2xl mb-8">
+                    <div class="flex items-center gap-3 mb-3 text-blue-400 hc:text-yellow-400">
+                        <i class="ph-bold ph-calendar-check text-2xl"></i>
+                        <span class="text-sm font-semibold uppercase tracking-wider">Cronograma Personalizado</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Vamos entender sua rotina</h3>
+                    <p class="text-sm text-slate-300 hc:text-gray-300">
+                        Poucas perguntas para montar um plano de estudos que cabe no seu dia a dia.
+                    </p>
+                </div>
+
+                <h1 class="text-3xl lg:text-4xl font-bold tracking-tight mb-4 leading-tight">
+                    Um cronograma que combina com você.
+                </h1>
+                <p class="text-slate-400 hc:text-gray-300 text-base">
+                    Tempo disponível, dias livres e as matérias mais difíceis — tudo isso ajuda a montar um plano realista.
+                </p>
+            </div>
+
+            <!-- Rodapé esquerdo -->
+            <div class="z-10 flex items-center justify-between text-xs text-slate-400 hc:text-gray-400">
+                <span>© 2026 Rota Do sucesso</span>
+            </div>
+        </div>
+
+        <!-- LADO DIREITO: Questionário -->
+        <div class="flex-1 flex flex-col justify-between p-6 sm:p-12 md:p-16 relative overflow-y-auto max-h-screen">
+
+            <!-- Top Bar: Logo mobile + Seletor de Tema + Voltar -->
+            <div class="flex items-center justify-between w-full max-w-2xl mx-auto gap-4">
+                <div class="flex md:hidden items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600 hc:bg-yellow-400 hc:text-black text-white flex items-center justify-center text-lg font-bold">
+                        <i class="ph-fill ph-graduation-cap"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight">Lumina</span>
+                </div>
+
+                <div class="ml-auto flex items-center gap-3">
+                    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 hc:bg-black hc:border hc:border-white p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                        <button @click="theme = 'light'" :class="theme === 'light' ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Tema Claro">
+                            <i class="ph-bold ph-sun"></i>
+                        </button>
+                        <button @click="theme = 'dark'" :class="theme === 'dark' ? 'bg-white dark:bg-slate-800 text-blue-600 shadow-sm' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Tema Escuro">
+                            <i class="ph-bold ph-moon"></i>
+                        </button>
+                        <button @click="theme = 'hc'" :class="theme === 'hc' ? 'bg-white text-black font-bold' : 'text-slate-500'" class="p-2 rounded-lg text-sm transition-all" title="Alto Contraste">
+                            <i class="ph-bold ph-circle-half-tilt"></i>
+                        </button>
+                    </div>
+                    <a
+                        href="perfil-visualizar.html"
+                        class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 hc:text-white hc:hover:text-yellow-300 rounded-lg transition-all"
+                    >
+                        <i class="ph-bold ph-arrow-left text-lg"></i>
+                        <span class="hidden sm:inline">Voltar ao perfil</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Conteúdo Principal -->
+            <div class="w-full max-w-md mx-auto my-auto py-8">
+
+                <!-- Carregando -->
+                <div x-show="carregando" class="text-center text-sm text-slate-500 dark:text-slate-400 hc:text-white py-16">
+                    Carregando...
+                </div>
+
+                <template x-if="!carregando">
+                    <div>
+                        <div class="mb-8">
+                            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Cronograma Personalizado</h2>
+                            <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300 text-sm">Responda com sinceridade — quanto mais realista, melhor o plano fica.</p>
+                        </div>
+
+                        <form @submit.prevent="handleSubmit" class="space-y-6">
+
+                            <!-- Horas por dia -->
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1.5">Quantas horas por dia você tem disponível para estudar?</label>
+                                <div class="relative flex items-center">
+                                    <i class="ph ph-clock absolute left-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="12"
+                                        step="0.5"
+                                        required
+                                        x-model="horasPorDia"
+                                        placeholder="Ex: 2"
+                                        class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Dias da semana -->
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-2">Em quais dias da semana você pode estudar?</label>
+                                <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                                    <template x-for="dia in diasOptions" :key="dia.id">
+                                        <label
+                                            class="flex flex-col items-center justify-center gap-1 p-2 bg-white dark:bg-slate-900 hc:bg-black border rounded-xl cursor-pointer transition-all text-center"
+                                            :class="diasSemana.includes(dia.id) ? 'border-blue-500 ring-1 ring-blue-500 hc:border-yellow-400 hc:ring-yellow-400' : 'border-slate-200 dark:border-slate-800 hc:border-white hover:border-blue-400'"
+                                        >
+                                            <input type="checkbox" :value="dia.id" x-model="diasSemana" class="sr-only">
+                                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-200 hc:text-white" x-text="dia.label"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Matérias com mais dificuldade -->
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-2">Em quais matérias você tem mais dificuldade?</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <template x-for="materia in materiasOptions" :key="materia.id">
+                                        <label
+                                            class="flex items-center gap-2 p-3 bg-white dark:bg-slate-900 hc:bg-black border rounded-xl cursor-pointer transition-all"
+                                            :class="materiasDificeis.includes(materia.id) ? 'border-blue-500 ring-1 ring-blue-500 hc:border-yellow-400 hc:ring-yellow-400' : 'border-slate-200 dark:border-slate-800 hc:border-white hover:border-blue-400'"
+                                        >
+                                            <input type="checkbox" :value="materia.id" x-model="materiasDificeis" class="accent-blue-600 hc:accent-yellow-400">
+                                            <span class="text-sm font-medium text-slate-700 dark:text-slate-200 hc:text-white" x-text="materia.label"></span>
+                                        </label>
+                                    </template>
+                                </div>
+
+                                <!-- Campo adicional se marcar 'Outra' -->
+                                <div x-show="materiasDificeis.includes('outra')" x-collapse x-cloak class="pt-2">
+                                    <input
+                                        type="text"
+                                        maxlength="100"
+                                        x-model="materiaDificilOutra"
+                                        placeholder="Qual outra matéria?"
+                                        class="w-full px-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Período do dia -->
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-2">Em qual período do dia você rende mais?</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <template x-for="periodo in periodoOptions" :key="periodo.id">
+                                        <label class="flex items-center gap-2 p-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl cursor-pointer hover:border-blue-500 transition-all">
+                                            <input type="radio" name="periodo_preferido" :value="periodo.id" x-model="periodoPreferido" class="accent-blue-600 hc:accent-yellow-400">
+                                            <span class="text-sm font-medium text-slate-700 dark:text-slate-200 hc:text-white" x-text="periodo.label"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Duração de foco -->
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 hc:text-white mb-1.5">Quanto tempo você consegue manter o foco antes de precisar de uma pausa?</label>
+                                <div class="relative flex items-center">
+                                    <i class="ph ph-timer absolute left-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                                    <select
+                                        required
+                                        x-model="duracaoFoco"
+                                        class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 hc:bg-black border border-slate-200 dark:border-slate-800 hc:border-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hc:focus:ring-yellow-400 transition-all text-slate-700 dark:text-slate-200 hc:text-white appearance-none"
+                                    >
+                                        <option value="" disabled>Selecione...</option>
+                                        <option value="1">15 minutos</option>
+                                        <option value="2">25 minutos</option>
+                                        <option value="3">30 minutos</option>
+                                        <option value="4">45 minutos</option>
+                                        <option value="5">1 hora ou mais</option>
+                                    </select>
+                                    <i class="ph ph-caret-down absolute right-3.5 text-slate-400 text-lg pointer-events-none"></i>
+                                </div>
+                            </div>
+
+                            <!-- Mensagens -->
+                            <p x-show="erro" x-cloak class="text-sm text-red-600 hc:text-yellow-300" x-text="erro"></p>
+                            <p x-show="sucesso" x-cloak class="text-sm text-green-600 hc:text-yellow-300" x-text="sucesso"></p>
+
+                            <!-- Botão de Envio -->
+                            <button
+                                type="submit"
+                                :disabled="salvando"
+                                class="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 hc:bg-yellow-400 hc:hover:bg-yellow-500 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 text-white font-medium rounded-xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-60 disabled:hover:translate-y-0"
+                            >
+                                <span x-text="salvando ? 'Salvando...' : 'Salvar cronograma'"></span>
+                                <i class="ph-bold ph-check-circle text-lg" x-show="!salvando"></i>
+                            </button>
+                        </form>
+                    </div>
+                </template>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Lógica Alpine.js -->
+    <script>
+        function cronogramaApp() {
+            return {
+                theme: 'auto',
+                isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+
+                usuarioId: null,
+                carregando: true,
+                salvando: false,
+                erro: '',
+                sucesso: '',
+
+                horasPorDia: '',
+                diasSemana: [],
+                materiasDificeis: [],
+                materiaDificilOutra: '',
+                periodoPreferido: '',
+                duracaoFoco: '',
+
+                diasOptions: [
+                    { id: 'seg', label: 'Seg' },
+                    { id: 'ter', label: 'Ter' },
+                    { id: 'qua', label: 'Qua' },
+                    { id: 'qui', label: 'Qui' },
+                    { id: 'sex', label: 'Sex' },
+                    { id: 'sab', label: 'Sáb' },
+                    { id: 'dom', label: 'Dom' },
+                ],
+                materiasOptions: [
+                    { id: 'matematica', label: 'Matemática' },
+                    { id: 'portugues', label: 'Português' },
+                    { id: 'fisica', label: 'Física' },
+                    { id: 'quimica', label: 'Química' },
+                    { id: 'biologia', label: 'Biologia' },
+                    { id: 'historia', label: 'História' },
+                    { id: 'geografia', label: 'Geografia' },
+                    { id: 'ingles', label: 'Inglês' },
+                    { id: 'redacao', label: 'Redação' },
+                    { id: 'outra', label: 'Outra' },
+                ],
+                periodoOptions: [
+                    { id: '1', label: 'Manhã' },
+                    { id: '2', label: 'Tarde' },
+                    { id: '3', label: 'Noite' },
+                    { id: '4', label: 'Madrugada' },
+                ],
+
+                get isDarkClass() {
+                    return this.theme === 'dark' || (this.theme === 'auto' && this.isSystemDark) || this.theme === 'hc';
+                },
+
+                async init() {
+                    const usuarioId = sessionStorage.getItem('usuarioId');
+                    if (!usuarioId) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    this.usuarioId = usuarioId;
+                    await this.carregarCronograma();
+                },
+
+                async carregarCronograma() {
+                    this.carregando = true;
+
+                    try {
+                        const resposta = await fetch(`/api/cronograma/${this.usuarioId}`);
+
+                        if (resposta.status === 404) {
+                            // Ainda não preencheu — formulário fica em branco, tudo bem.
+                            this.carregando = false;
+                            return;
+                        }
+
+                        const dados = await resposta.json();
+                        this.carregando = false;
+
+                        if (!resposta.ok) {
+                            this.erro = dados.erro || 'Erro ao carregar cronograma.';
+                            return;
+                        }
+
+                        this.horasPorDia = dados.horasPorDia;
+                        this.diasSemana = dados.diasSemana || [];
+                        this.materiasDificeis = dados.materiasDificeis || [];
+                        this.materiaDificilOutra = dados.materiaDificilOutra || '';
+                        this.periodoPreferido = String(dados.periodoPreferido || '');
+                        this.duracaoFoco = String(dados.duracaoFoco || '');
+
+                    } catch (err) {
+                        this.carregando = false;
+                        this.erro = 'Erro de conexão com o servidor.';
+                    }
+                },
+
+                async handleSubmit() {
+                    this.erro = '';
+                    this.sucesso = '';
+
+                    if (this.diasSemana.length === 0) {
+                        this.erro = 'Selecione pelo menos um dia da semana.';
+                        return;
+                    }
+                    if (this.materiasDificeis.length === 0) {
+                        this.erro = 'Selecione pelo menos uma matéria.';
+                        return;
+                    }
+
+                    this.salvando = true;
+
+                    try {
+                        const resposta = await fetch(`/api/cronograma/${this.usuarioId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                horasPorDia: this.horasPorDia,
+                                diasSemana: this.diasSemana,
+                                materiasDificeis: this.materiasDificeis,
+                                materiaDificilOutra: this.materiasDificeis.includes('outra') ? this.materiaDificilOutra : null,
+                                periodoPreferido: this.periodoPreferido,
+                                duracaoFoco: this.duracaoFoco,
+                            }),
+                        });
+
+                        const dados = await resposta.json();
+                        this.salvando = false;
+
+                        if (!resposta.ok) {
+                            this.erro = dados.erro || 'Erro ao salvar cronograma.';
+                            return;
+                        }
+
+                        this.sucesso = 'Cronograma salvo com sucesso!';
+
+                    } catch (err) {
+                        this.salvando = false;
+                        this.erro = 'Erro de conexão com o servidor.';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

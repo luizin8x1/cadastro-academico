@@ -1,0 +1,4403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo | Rota do Sucesso</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        /* Scroll discreto da lateral */
+        .admin-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .admin-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .admin-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+    </style>
+</head>
+
+<body
+    x-data="adminApp()"
+    x-init="initApp()"
+    class="bg-slate-50 text-slate-800 antialiased"
+>
+    <div class="min-h-screen flex overflow-hidden">
+
+        <!-- =========================================================
+             SIDEBAR DESKTOP
+        ========================================================== -->
+        <aside
+            class="hidden md:flex flex-col w-64 h-screen flex-shrink-0
+                   bg-gradient-to-b from-white via-blue-50/40 to-cyan-50/60
+                   border-r border-blue-100"
+        >
+            <!-- LOGO -->
+            <div class="h-24 flex items-center justify-center px-5 border-b border-slate-100">
+                <img
+                    src="img/logo_1.png"
+                    alt="Rota do Sucesso"
+                    class="h-20 w-auto object-contain"
+                >
+            </div>
+
+            <!-- IDENTIFICAÇÃO DO PAINEL -->
+            <div class="px-5 pt-5 pb-3">
+                <div class="flex items-center gap-3 px-3 py-3 rounded-2xl bg-blue-600 text-white shadow-sm">
+                    <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
+                        <i class="ph-bold ph-shield-check text-xl"></i>
+                    </div>
+
+                    <div class="min-w-0">
+                        <p class="text-[10px] uppercase tracking-[0.16em] text-blue-100 font-bold">
+                            Rota do Sucesso
+                        </p>
+                        <p class="font-bold text-sm">
+                            Administração
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MENU -->
+            <nav class="flex-1 min-h-0 overflow-y-auto admin-scroll px-4 py-3">
+
+                <!-- PAINEL -->
+                <div class="mb-6">
+                    <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                        Painel
+                    </p>
+
+                    <button
+                        @click="selecionarMenu('dashboard')"
+                        :class="classeMenu('dashboard')"
+                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                    >
+                        <i class="ph ph-squares-four text-lg"></i>
+                        <span>Visão geral</span>
+                    </button>
+                </div>
+
+                <!-- GERENCIAMENTO -->
+                <div class="mb-6">
+                    <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                        Gerenciamento
+                    </p>
+
+                    <div class="space-y-1">
+                        <button
+                            @click="selecionarMenu('usuarios')"
+                            :class="classeMenu('usuarios')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-users-three text-lg"></i>
+                            <span>Usuários</span>
+                        </button>
+
+                        <button
+                            @click="selecionarMenu('turmas')"
+                            :class="classeMenu('turmas')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-chalkboard-teacher text-lg"></i>
+                            <span>Turmas</span>
+                        </button>
+
+                        <button
+                            @click="selecionarMenu('administradores')"
+                            :class="classeMenu('administradores')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-identification-badge text-lg"></i>
+                            <span>Administradores</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTEÚDO -->
+                <div class="mb-6">
+                    <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                        Conteúdo
+                    </p>
+
+                    <div class="space-y-1">
+                        <button
+                            @click="selecionarMenu('disciplinas')"
+                            :class="classeMenu('disciplinas')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-books text-lg"></i>
+                            <span>Disciplinas</span>
+                        </button>
+
+                        <button
+                            @click="selecionarMenu('videos')"
+                            :class="classeMenu('videos')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-video-camera text-lg"></i>
+                            <span>Vídeos</span>
+                        </button>
+
+                        <button
+                            @click="selecionarMenu('questoes')"
+                            :class="classeMenu('questoes')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-question text-lg"></i>
+                            <span>Questões</span>
+                        </button>
+
+                        <button
+                            @click="selecionarMenu('frases')"
+                            :class="classeMenu('frases')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-quotes text-lg"></i>
+                            <span>Frases motivacionais</span>
+                        </button>
+
+                        <button
+                            @click="selecionarMenu('planos-curso')"
+                            :class="classeMenu('planos-curso')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-notebook text-lg"></i>
+                            <span>Planos de curso</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SISTEMA -->
+                <div class="mb-4">
+                    <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                        Sistema
+                    </p>
+
+                    <div class="space-y-1">
+                        <button
+                            @click="selecionarMenu('relatorios')"
+                            :class="classeMenu('relatorios')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-chart-bar text-lg"></i>
+                            <span>Relatórios</span>
+                        </button>
+
+                       <button
+                            @click="selecionarMenu('validacoes-erros')"
+                            :class="classeMenu('validacoes-erros')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                        <i class="ph ph-bug-beetle text-lg"></i>
+                            <span>Validações e Erros</span>
+                        </button>     
+
+                        <button
+                            @click="selecionarMenu('configuracoes')"
+                            :class="classeMenu('configuracoes')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition"
+                        >
+                            <i class="ph ph-gear-six text-lg"></i>
+                            <span>Configurações</span>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- PERFIL ADMINISTRADOR -->
+            <div class="p-4 border-t border-slate-200">
+                <div class="flex items-center gap-3 px-2 py-2">
+                    <div
+                        class="w-11 h-11 rounded-full bg-blue-600 text-white
+                               flex items-center justify-center font-bold
+                               border-2 border-white shadow-sm flex-shrink-0"
+                    >
+                        <span x-text="inicialAdministrador"></span>
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <p
+                            class="text-sm font-semibold text-slate-900 truncate"
+                            x-text="primeiroNome"
+                        ></p>
+
+                        <div class="flex items-center gap-1 text-[11px] text-blue-600 font-semibold">
+                            <i class="ph-fill ph-shield-check"></i>
+                            <span>Administrador</span>
+                        </div>
+                    </div>
+
+                    <button
+                        @click="sair()"
+                        type="button"
+                        title="Sair"
+                        class="w-9 h-9 rounded-lg flex items-center justify-center
+                               text-red-500 hover:bg-red-50 transition"
+                    >
+                        <i class="ph-bold ph-sign-out text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+
+        <!-- =========================================================
+             ÁREA PRINCIPAL
+        ========================================================== -->
+        <main class="flex-1 min-w-0 h-screen overflow-hidden bg-slate-50">
+
+            <!-- HEADER MOBILE -->
+            <header
+                class="md:hidden h-16 bg-white border-b border-slate-200
+                       flex items-center justify-between px-5"
+            >
+                <img
+                    src="img/horizontallogotrans.png"
+                    alt="Rota do Sucesso"
+                    class="h-9 w-auto object-contain"
+                >
+
+                <button
+                    @click="mobileMenuOpen = true"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl
+                           text-slate-600 hover:bg-slate-100"
+                >
+                    <i class="ph-bold ph-list text-2xl"></i>
+                </button>
+            </header>
+
+            <!-- =========================================================
+     CONTEÚDO ADMINISTRATIVO
+========================================================== -->
+<div class="h-[calc(100vh-4rem)] md:h-screen overflow-y-auto">
+
+<!-- VISÃO GERAL -->
+<section x-show="currentTab === 'dashboard'" x-cloak class="p-6 md:p-10">
+    <div class="mb-8">
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Visão geral</h1>
+        <p class="text-sm text-slate-500 mt-1">Resumo atualizado dos registros acadêmicos.</p>
+    </div>
+    <div x-show="adminDataErro" x-text="adminDataErro" class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+    <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <template x-for="card in resumoAdminCards" :key="card.chave">
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <p class="text-sm font-medium text-slate-500" x-text="card.rotulo"></p>
+                <p class="mt-3 text-3xl font-bold text-slate-900" x-text="resumoAdmin[card.chave] ?? '—'"></p>
+            </article>
+        </template>
+    </div>
+</section>
+
+<!-- USUÁRIOS -->
+<section x-show="currentTab === 'usuarios'" x-cloak class="p-6 md:p-10">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Usuários</h1>
+            <p class="mt-1 text-sm text-slate-500">Contas e perfis acadêmicos cadastrados.</p>
+        </div>
+        <button @click="carregarDadosAdmin('usuarios')" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Atualizar lista</button>
+    </div>
+    <div x-show="adminDataErro" x-text="adminDataErro" class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full min-w-[900px]">
+            <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-5 py-4">ID</th><th class="px-5 py-4">Usuário</th><th class="px-5 py-4">Série / escola</th><th class="px-5 py-4">Tipo</th><th class="px-5 py-4 text-center">Ações</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+                <template x-for="item in adminUsuarios.filter(registro => registro.tipo_usuario !== 'administrador')" :key="item.id">
+                    <tr class="hover:bg-slate-50"><td class="px-5 py-4 text-sm text-slate-500" x-text="item.id"></td><td class="px-5 py-4"><p class="font-semibold text-slate-800" x-text="item.nome"></p><p class="text-sm text-slate-500" x-text="item.email"></p></td><td class="px-5 py-4 text-sm text-slate-600"><span x-text="item.serie || '—'"></span><span x-show="item.escola"> · </span><span x-text="item.escola || ''"></span></td><td class="px-5 py-4 text-sm text-slate-600" x-text="item.status || 'Ativo'"></td><td class="px-5 py-4"><div class="flex justify-center gap-2"><button @click="abrirEdicaoUsuario(item)" title="Editar usuário" class="rounded-lg p-2 text-blue-600 hover:bg-blue-50"><i class="ph-bold ph-pencil-simple"></i></button><button @click="excluirRegistroAdmin('usuarios', item)" title="Excluir usuário" class="rounded-lg p-2 text-red-500 hover:bg-red-50"><i class="ph-bold ph-trash"></i></button></div></td></tr>
+                </template>
+                <tr x-show="!adminCarregando && adminUsuarios.filter(registro => registro.tipo_usuario !== 'administrador').length === 0"><td colspan="5" class="px-5 py-12 text-center text-sm text-slate-500">Nenhum usuário cadastrado.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- TURMAS: agrupamento com os dados existentes no perfil acadêmico -->
+<section x-show="currentTab === 'turmas'" x-cloak class="p-6 md:p-10">
+    <div class="mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Turmas</h1>
+        <p class="mt-1 text-sm text-slate-500">Alunos organizados pelos dados de série, etapa, escola e trilha registrados no perfil acadêmico.</p>
+    </div>
+    <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">O banco não possui uma tabela própria de turmas. Esta lista reúne os alunos pelos campos acadêmicos disponíveis; editar ou excluir atua no cadastro do aluno.</div>
+    <div x-show="adminDataErro" x-text="adminDataErro" class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full min-w-[950px]"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-5 py-4">Aluno</th><th class="px-5 py-4">Série</th><th class="px-5 py-4">Etapa SESI</th><th class="px-5 py-4">Escola</th><th class="px-5 py-4">Trilha</th><th class="px-5 py-4 text-center">Ações</th></tr></thead>
+            <tbody class="divide-y divide-slate-100"><template x-for="item in turmasAlunos" :key="item.id"><tr class="hover:bg-slate-50"><td class="px-5 py-4"><p class="font-semibold text-slate-800" x-text="item.nome"></p><p class="text-sm text-slate-500" x-text="item.email"></p></td><td class="px-5 py-4 text-sm text-slate-600" x-text="item.serie || '—'"></td><td class="px-5 py-4 text-sm text-slate-600" x-text="item.etapa_sesi || item.etapa_atual || '—'"></td><td class="px-5 py-4 text-sm text-slate-600" x-text="item.escola || '—'"></td><td class="px-5 py-4 text-sm text-slate-600" x-text="item.trilha_sesi || '—'"></td><td class="px-5 py-4"><div class="flex justify-center gap-2"><button @click="abrirEdicaoUsuario(item)" title="Editar aluno" class="rounded-lg p-2 text-blue-600 hover:bg-blue-50"><i class="ph-bold ph-pencil-simple"></i></button><button @click="excluirRegistroAdmin('usuarios', item)" title="Excluir aluno" class="rounded-lg p-2 text-red-500 hover:bg-red-50"><i class="ph-bold ph-trash"></i></button></div></td></tr></template><tr x-show="!adminCarregando && turmasAlunos.length === 0"><td colspan="6" class="px-5 py-12 text-center text-sm text-slate-500">Não há alunos com dados de turma cadastrados.</td></tr></tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ADMINISTRADORES -->
+<section x-show="currentTab === 'administradores'" x-cloak class="p-6 md:p-10">
+    <div class="mb-6"><h1 class="text-2xl md:text-3xl font-bold text-slate-900">Administradores</h1><p class="mt-1 text-sm text-slate-500">Contas com perfil administrativo.</p></div>
+    <div x-show="adminDataErro" x-text="adminDataErro" class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm"><table class="w-full min-w-[760px]"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-5 py-4">ID</th><th class="px-5 py-4">Nome</th><th class="px-5 py-4">E-mail</th><th class="px-5 py-4">Status</th><th class="px-5 py-4 text-center">Ações</th></tr></thead><tbody class="divide-y divide-slate-100"><template x-for="item in adminAdministradores" :key="item.id"><tr class="hover:bg-slate-50"><td class="px-5 py-4 text-sm text-slate-500" x-text="item.id"></td><td class="px-5 py-4 font-semibold text-slate-800" x-text="item.nome"></td><td class="px-5 py-4 text-sm text-slate-600" x-text="item.email"></td><td class="px-5 py-4 text-sm text-slate-600" x-text="item.status || 'Ativo'"></td><td class="px-5 py-4"><div class="flex justify-center gap-2"><button @click="abrirEdicaoUsuario(item)" title="Editar administrador" class="rounded-lg p-2 text-blue-600 hover:bg-blue-50"><i class="ph-bold ph-pencil-simple"></i></button><button @click="excluirRegistroAdmin('usuarios', item)" title="Excluir administrador" class="rounded-lg p-2 text-red-500 hover:bg-red-50"><i class="ph-bold ph-trash"></i></button></div></td></tr></template><tr x-show="!adminCarregando && adminAdministradores.length === 0"><td colspan="5" class="px-5 py-12 text-center text-sm text-slate-500">Nenhuma conta administrativa encontrada.</td></tr></tbody></table></div>
+</section>
+
+<!-- DISCIPLINAS -->
+<section x-show="currentTab === 'disciplinas'" x-cloak class="p-6 md:p-10">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><h1 class="text-2xl md:text-3xl font-bold text-slate-900">Disciplinas</h1><p class="mt-1 text-sm text-slate-500">Disciplinas disponíveis no banco acadêmico.</p></div><button @click="abrirNovaDisciplina()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"><i class="ph-bold ph-plus"></i> Nova disciplina</button></div>
+    <div x-show="adminDataErro" x-text="adminDataErro" class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm"><table class="w-full min-w-[650px]"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-5 py-4">ID</th><th class="px-5 py-4">Disciplina</th><th class="px-5 py-4">Área do conhecimento</th><th class="px-5 py-4 text-center">Ações</th></tr></thead><tbody class="divide-y divide-slate-100"><template x-for="item in adminDisciplinas" :key="item.id"><tr class="hover:bg-slate-50"><td class="px-5 py-4 text-sm text-slate-500" x-text="item.id"></td><td class="px-5 py-4 font-semibold text-slate-800" x-text="item.nome"></td><td class="px-5 py-4 text-sm text-slate-600" x-text="item.area_conhecimento || '—'"></td><td class="px-5 py-4"><div class="flex justify-center gap-2"><button @click="abrirEdicaoDisciplina(item)" title="Editar disciplina" class="rounded-lg p-2 text-blue-600 hover:bg-blue-50"><i class="ph-bold ph-pencil-simple"></i></button><button @click="excluirRegistroAdmin('disciplinas', item)" title="Excluir disciplina" class="rounded-lg p-2 text-red-500 hover:bg-red-50"><i class="ph-bold ph-trash"></i></button></div></td></tr></template><tr x-show="!adminCarregando && adminDisciplinas.length === 0"><td colspan="4" class="px-5 py-12 text-center text-sm text-slate-500">Nenhuma disciplina cadastrada.</td></tr></tbody></table></div>
+</section>
+
+<!-- VÍDEOS E QUESTÕES: tabelas não existem na estrutura fornecida -->
+<template x-for="aba in ['videos', 'questoes']" :key="aba">
+    <section x-show="currentTab === aba" x-cloak class="p-6 md:p-10">
+        <div class="mb-6"><h1 class="text-2xl md:text-3xl font-bold text-slate-900" x-text="aba === 'videos' ? 'Vídeos' : 'Questões'"></h1><p class="mt-1 text-sm text-slate-500">Conteúdos cadastrados para os estudantes.</p></div>
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900" x-text="aba === 'videos' ? 'A estrutura do banco conectada não possui uma tabela de vídeos. Quando esses dados forem adicionados ao banco, eles poderão aparecer aqui.' : 'A estrutura do banco conectada não possui uma tabela de questões. Quando esses dados forem adicionados ao banco, eles poderão aparecer aqui.'"></div>
+    </section>
+</template>
+
+<!-- PLANOS DE CURSO -->
+<section x-show="currentTab === 'planos-curso'" x-cloak class="p-6 md:p-10">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><h1 class="text-2xl md:text-3xl font-bold text-slate-900">Planos de curso</h1><p class="mt-1 text-sm text-slate-500">Ano letivo, série, etapa, disciplina e conteúdos associados.</p></div><button @click="abrirNovoPlanoCurso()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"><i class="ph-bold ph-plus"></i> Novo plano</button></div>
+    <div x-show="adminDataErro" x-text="adminDataErro" class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm"><table class="w-full min-w-[900px]"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-5 py-4">Ano</th><th class="px-5 py-4">Série / etapa</th><th class="px-5 py-4">Disciplina</th><th class="px-5 py-4">Trilha / versão</th><th class="px-5 py-4">Conteúdos</th><th class="px-5 py-4">Status</th><th class="px-5 py-4 text-center">Ações</th></tr></thead><tbody class="divide-y divide-slate-100"><template x-for="item in adminPlanosCurso" :key="item.id"><tr class="hover:bg-slate-50"><td class="px-5 py-4 text-sm text-slate-700" x-text="item.ano_letivo"></td><td class="px-5 py-4 text-sm text-slate-700"><span x-text="item.serie"></span>ª · Etapa <span x-text="item.etapa"></span></td><td class="px-5 py-4 font-semibold text-slate-800" x-text="item.disciplina || '—'"></td><td class="px-5 py-4 text-sm text-slate-600"><span x-text="item.trilha || 'Sem trilha'"></span> · v<span x-text="item.versao"></span></td><td class="px-5 py-4 text-sm text-slate-600" x-text="item.total_conteudos"></td><td class="px-5 py-4 text-sm" :class="item.ativo ? 'text-emerald-700' : 'text-slate-500'" x-text="item.ativo ? 'Ativo' : 'Inativo'"></td><td class="px-5 py-4"><div class="flex justify-center gap-2"><button @click="abrirEdicaoPlanoCurso(item)" title="Editar plano" class="rounded-lg p-2 text-blue-600 hover:bg-blue-50"><i class="ph-bold ph-pencil-simple"></i></button><button @click="excluirRegistroAdmin('planos-curso', item)" title="Excluir plano" class="rounded-lg p-2 text-red-500 hover:bg-red-50"><i class="ph-bold ph-trash"></i></button></div></td></tr></template><tr x-show="!adminCarregando && adminPlanosCurso.length === 0"><td colspan="7" class="px-5 py-12 text-center text-sm text-slate-500">Nenhum plano de curso cadastrado.</td></tr></tbody></table></div>
+</section>
+
+<!-- RELATÓRIOS -->
+<section x-show="currentTab === 'relatorios'" x-cloak class="p-6 md:p-10">
+    <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div><h1 class="text-2xl md:text-3xl font-bold text-slate-900">Relatórios</h1><p class="mt-1 text-sm text-slate-500">Totais atuais das principais tabelas acadêmicas.</p></div>
+        <button @click="carregarResumoAdmin()" class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Atualizar relatório</button>
+    </div>
+    <div x-show="adminDataErro" x-text="adminDataErro" class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+    <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <template x-for="card in resumoAdminCards" :key="card.chave">
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <p class="text-sm font-medium text-slate-500" x-text="card.rotulo"></p>
+                <p class="mt-3 text-3xl font-bold text-slate-900" x-text="resumoAdmin[card.chave] ?? '—'"></p>
+            </article>
+        </template>
+    </div>
+</section>
+
+<!-- CONFIGURAÇÕES -->
+<section x-show="currentTab === 'configuracoes'" x-cloak class="p-6 md:p-10">
+    <div class="mb-8"><h1 class="text-2xl md:text-3xl font-bold text-slate-900">Configurações</h1><p class="mt-1 text-sm text-slate-500">Dados da conta administrativa conectada.</p></div>
+    <div class="max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <dl class="grid gap-5 sm:grid-cols-2">
+            <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Nome</dt><dd class="mt-1 font-semibold text-slate-900" x-text="nome"></dd></div>
+            <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">E-mail</dt><dd class="mt-1 font-semibold text-slate-900" x-text="email || '—'"></dd></div>
+            <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Perfil</dt><dd class="mt-1 font-semibold text-slate-900">Administrador</dd></div>
+            <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Sessão</dt><dd class="mt-1 font-semibold text-slate-900">Acesso administrativo autenticado</dd></div>
+        </dl>
+    </div>
+</section>
+
+<!-- =========================================================
+     VALIDAÇÕES E ERROS
+========================================================== -->
+
+<section
+    x-show="currentTab === 'validacoes-erros'"
+    x-cloak
+    class="p-6 md:p-10"
+>
+
+    <!-- CABEÇALHO -->
+    <div class="flex flex-col xl:flex-row
+                xl:items-center xl:justify-between
+                gap-5 mb-8">
+
+        <div>
+
+            <div class="flex items-center gap-3">
+
+                <div class="w-11 h-11 rounded-xl
+                            bg-blue-50 text-blue-600
+                            flex items-center justify-center">
+
+                    <i class="ph-bold ph-bug-beetle text-2xl"></i>
+
+                </div>
+
+                <div>
+
+                    <h1 class="text-2xl md:text-3xl
+                               font-bold text-slate-900">
+
+                        Validações e Erros
+
+                    </h1>
+
+                    <p class="text-sm text-slate-500 mt-1">
+
+                        Registre validações necessárias e erros
+                        encontrados durante o desenvolvimento do sistema.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- BOTÕES -->
+        <div class="flex flex-col sm:flex-row gap-3">
+
+            <button
+                type="button"
+                @click="abrirModalValidacaoErro('validacao')"
+                class="inline-flex items-center justify-center gap-2
+                bg-blue-600 hover:bg-blue-700
+                text-white font-semibold
+                px-5 py-3 rounded-xl
+                shadow-sm transition"
+            >
+
+                <i class="ph-bold ph-plus-circle text-lg"></i>
+
+                Cadastrar Nova Validação
+
+            </button>
+
+
+            <button
+                type="button"
+                @click="abrirModalValidacaoErro('erro')"
+                class="inline-flex items-center justify-center gap-2
+                       bg-red-600 hover:bg-red-700
+                       text-white font-semibold
+                       px-5 py-3 rounded-xl
+                       shadow-sm transition"
+            >
+
+                <i class="ph-bold ph-warning-circle text-lg"></i>
+
+                Cadastrar Erro de Sistema
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         TABELA DE VALIDAÇÕES
+    ====================================================== -->
+
+    <div class="bg-white
+                border border-slate-200
+                rounded-2xl shadow-sm
+                overflow-hidden mb-8">
+
+        <!-- TÍTULO -->
+        <div class="px-6 py-5
+                    border-b border-slate-200
+                    flex items-center gap-3">
+
+            <div class="w-9 h-9 rounded-lg
+                        bg-blue-50 text-blue-600
+                        flex items-center justify-center">
+
+                <i class="ph-bold ph-check-square-offset text-lg"></i>
+
+            </div>
+
+            <div>
+
+                <h2 class="font-bold text-slate-900">
+
+                    Validações a serem feitas no sistema
+
+                </h2>
+
+                <p class="text-xs text-slate-500 mt-0.5">
+
+                    Pontos que precisam ser conferidos pela equipe.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full min-w-[1100px]">
+
+                <thead class="bg-slate-50
+                              border-b border-slate-200">
+
+                    <tr class="text-left text-xs
+                               uppercase tracking-wider
+                               text-slate-500">
+
+                        <th class="px-5 py-4 w-20">
+                            Número
+                        </th>
+
+                        <th class="px-5 py-4 min-w-[300px]">
+                            Descrição da validação
+                        </th>
+
+                        <th class="px-5 py-4 w-44">
+                            Grau de importância
+                        </th>
+
+                        <th class="px-5 py-4 w-48">
+                            Inserção
+                        </th>
+
+                        <th class="px-5 py-4 w-40">
+                            Data de conserto
+                        </th>
+
+                        <th class="px-5 py-4 w-44">
+                            Consertado por
+                        </th>
+
+                        <th class="px-5 py-4 w-28 text-center">
+                            Ações
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+<tbody class="divide-y divide-slate-100">
+
+    <!-- REGISTROS -->
+    <template
+        x-for="item in validacoesErros.filter(registro => registro.tipo === 'validacao')"
+        :key="item.id"
+    >
+        <tr class="hover:bg-slate-50 transition">
+
+            <!-- NÚMERO -->
+            <td class="px-5 py-4 text-sm font-semibold text-slate-600">
+                <span x-text="item.id"></span>
+            </td>
+
+
+            <!-- DESCRIÇÃO -->
+            <td class="px-5 py-4">
+                <p
+                    class="text-sm text-slate-800 leading-relaxed"
+                    x-text="item.descricao"
+                ></p>
+            </td>
+
+
+            <!-- IMPORTÂNCIA -->
+            <td class="px-5 py-4">
+
+                <span
+                    class="inline-flex items-center px-3 py-1
+                           rounded-full text-xs font-bold"
+                    :class="{
+                        'bg-slate-100 text-slate-600':
+                            item.importancia === 'baixa',
+
+                        'bg-amber-50 text-amber-700':
+                            item.importancia === 'media',
+
+                        'bg-orange-50 text-orange-700':
+                            item.importancia === 'alta',
+
+                        'bg-red-50 text-red-700':
+                            item.importancia === 'critica'
+                    }"
+                    x-text="{
+                        baixa: 'Baixa',
+                        media: 'Média',
+                        alta: 'Alta',
+                        critica: 'Crítica'
+                    }[item.importancia]"
+                ></span>
+
+            </td>
+
+
+            <!-- INSERÇÃO -->
+            <td class="px-5 py-4">
+
+                <p
+                    class="text-sm font-semibold text-slate-700"
+                    x-text="new Date(item.criado_em).toLocaleDateString('pt-BR')"
+                ></p>
+
+                <p
+                    class="text-xs text-slate-400 mt-1"
+                    x-text="item.inserido_por_nome"
+                ></p>
+
+            </td>
+
+
+            <!-- DATA DE CONSERTO -->
+            <td class="px-5 py-4 text-sm text-slate-500">
+
+                <span
+                    x-text="item.resolvido_em
+                        ? new Date(item.resolvido_em).toLocaleDateString('pt-BR')
+                        : '—'"
+                ></span>
+
+            </td>
+
+
+            <!-- CONSERTADO POR -->
+            <td class="px-5 py-4">
+
+                <template x-if="item.resolvido_por_nome">
+                    <span
+                        class="text-sm font-medium text-slate-700"
+                        x-text="item.resolvido_por_nome"
+                    ></span>
+                </template>
+
+                <template x-if="!item.resolvido_por_nome">
+
+                    <button
+                        type="button"
+                        @click="abrirResolucaoValidacaoErro(item)"
+                        title="Marcar como resolvido"
+                        class="w-9 h-9 rounded-lg
+                               bg-emerald-50 text-emerald-600
+                               hover:bg-emerald-100
+                               flex items-center justify-center
+                               transition"
+                    >
+                        <i class="ph-bold ph-plus"></i>
+                    </button>
+
+                </template>
+
+            </td>
+
+
+            <!-- AÇÕES -->
+            <td class="px-5 py-4">
+
+                <div class="flex items-center justify-center gap-1">
+
+                    <button
+                        type="button"
+                        @click="abrirEdicaoValidacaoErro(item)"
+                        title="Editar"
+                        class="w-9 h-9 rounded-lg
+                               text-blue-600 hover:bg-blue-50
+                               flex items-center justify-center transition"
+                    >
+                        <i class="ph-bold ph-pencil-simple"></i>
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="abrirExclusaoValidacaoErro(item)"
+                        title="Excluir"
+                        class="w-9 h-9 rounded-lg
+                               text-red-500 hover:bg-red-50
+                               flex items-center justify-center transition"
+                    >
+                        <i class="ph-bold ph-trash"></i>
+                    </button>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    </template>
+
+
+    <!-- ESTADO VAZIO -->
+    <tr
+        x-show="validacoesErros.filter(
+            registro => registro.tipo === 'validacao'
+        ).length === 0"
+    >
+
+        <td
+            colspan="7"
+            class="px-6 py-14 text-center"
+        >
+
+            <div class="w-12 h-12 mx-auto
+                        rounded-full bg-slate-100
+                        flex items-center justify-center
+                        text-slate-400">
+
+                <i class="ph ph-check-square-offset text-2xl"></i>
+
+            </div>
+
+            <p class="mt-3 text-sm font-medium text-slate-600">
+                Nenhuma validação cadastrada.
+            </p>
+
+            <p class="text-xs text-slate-400 mt-1">
+                As novas validações aparecerão aqui.
+            </p>
+
+        </td>
+
+    </tr>
+
+</tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         TABELA DE ERROS
+    ====================================================== -->
+
+    <div class="bg-white
+                border border-slate-200
+                rounded-2xl shadow-sm
+                overflow-hidden">
+
+        <!-- TÍTULO -->
+        <div class="px-6 py-5
+                    border-b border-slate-200
+                    flex items-center gap-3">
+
+            <div class="w-9 h-9 rounded-lg
+                        bg-red-50 text-red-600
+                        flex items-center justify-center">
+
+                <i class="ph-bold ph-warning-octagon text-lg"></i>
+
+            </div>
+
+            <div>
+
+                <h2 class="font-bold text-slate-900">
+
+                    Erros a serem corrigidos
+
+                </h2>
+
+                <p class="text-xs text-slate-500 mt-0.5">
+
+                    Falhas identificadas que precisam de correção.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full min-w-[1100px]">
+
+                <thead class="bg-slate-50
+                              border-b border-slate-200">
+
+                    <tr class="text-left text-xs
+                               uppercase tracking-wider
+                               text-slate-500">
+
+                        <th class="px-5 py-4 w-20">
+                            Número
+                        </th>
+
+                        <th class="px-5 py-4 min-w-[300px]">
+                            Descrição do erro
+                        </th>
+
+                        <th class="px-5 py-4 w-44">
+                            Grau de importância
+                        </th>
+
+                        <th class="px-5 py-4 w-48">
+                            Inserção
+                        </th>
+
+                        <th class="px-5 py-4 w-40">
+                            Data de conserto
+                        </th>
+
+                        <th class="px-5 py-4 w-44">
+                            Consertado por
+                        </th>
+
+                        <th class="px-5 py-4 w-28 text-center">
+                            Ações
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody class="divide-y divide-slate-100">
+
+    <!-- REGISTROS DE ERROS -->
+    <template
+        x-for="item in validacoesErros.filter(registro => registro.tipo === 'erro')"
+        :key="item.id"
+    >
+        <tr class="hover:bg-slate-50 transition">
+
+            <!-- NÚMERO -->
+            <td class="px-5 py-4 text-sm font-semibold text-slate-600">
+                <span x-text="item.id"></span>
+            </td>
+
+
+            <!-- DESCRIÇÃO -->
+            <td class="px-5 py-4">
+                <p
+                    class="text-sm text-slate-800 leading-relaxed"
+                    x-text="item.descricao"
+                ></p>
+            </td>
+
+
+            <!-- IMPORTÂNCIA -->
+            <td class="px-5 py-4">
+
+                <span
+                    class="inline-flex items-center px-3 py-1
+                           rounded-full text-xs font-bold"
+                    :class="{
+                        'bg-slate-100 text-slate-600':
+                            item.importancia === 'baixa',
+
+                        'bg-amber-50 text-amber-700':
+                            item.importancia === 'media',
+
+                        'bg-orange-50 text-orange-700':
+                            item.importancia === 'alta',
+
+                        'bg-red-50 text-red-700':
+                            item.importancia === 'critica'
+                    }"
+                    x-text="{
+                        baixa: 'Baixa',
+                        media: 'Média',
+                        alta: 'Alta',
+                        critica: 'Crítica'
+                    }[item.importancia]"
+                ></span>
+
+            </td>
+
+
+            <!-- INSERÇÃO -->
+            <td class="px-5 py-4">
+
+                <p
+                    class="text-sm font-semibold text-slate-700"
+                    x-text="new Date(item.criado_em).toLocaleDateString('pt-BR')"
+                ></p>
+
+                <p
+                    class="text-xs text-slate-400 mt-1"
+                    x-text="item.inserido_por_nome"
+                ></p>
+
+            </td>
+
+
+            <!-- DATA DE CONSERTO -->
+            <td class="px-5 py-4 text-sm text-slate-500">
+
+                <span
+                    x-text="item.resolvido_em
+                        ? new Date(item.resolvido_em).toLocaleDateString('pt-BR')
+                        : '—'"
+                ></span>
+
+            </td>
+
+
+            <!-- CONSERTADO POR -->
+            <td class="px-5 py-4">
+
+                <!-- JÁ RESOLVIDO -->
+                <template x-if="item.resolvido_por_nome">
+
+                    <span
+                        class="text-sm font-medium text-slate-700"
+                        x-text="item.resolvido_por_nome"
+                    ></span>
+
+                </template>
+
+
+                <!-- AINDA NÃO RESOLVIDO -->
+                <template x-if="!item.resolvido_por_nome">
+
+                    <button
+                        type="button"
+                        @click="abrirResolucaoValidacaoErro(item)"
+                        title="Marcar como resolvido"
+                        class="w-9 h-9 rounded-lg
+                               bg-emerald-50 text-emerald-600
+                               hover:bg-emerald-100
+                               flex items-center justify-center
+                               transition"
+                    >
+                        <i class="ph-bold ph-plus"></i>
+                    </button>
+
+                </template>
+
+            </td>
+
+
+            <!-- AÇÕES -->
+            <td class="px-5 py-4">
+
+                <div class="flex items-center justify-center gap-1">
+
+                    <button
+                        type="button"
+                        @click="abrirEdicaoValidacaoErro(item)"
+                        title="Editar"
+                        class="w-9 h-9 rounded-lg
+                               text-blue-600 hover:bg-blue-50
+                               flex items-center justify-center
+                               transition"
+                    >
+                        <i class="ph-bold ph-pencil-simple"></i>
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="abrirExclusaoValidacaoErro(item)"
+                        title="Excluir"
+                        class="w-9 h-9 rounded-lg
+                               text-red-500 hover:bg-red-50
+                               flex items-center justify-center
+                               transition"
+                    >
+                        <i class="ph-bold ph-trash"></i>
+                    </button>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    </template>
+
+
+    <!-- ESTADO VAZIO -->
+    <tr
+        x-show="validacoesErros.filter(
+            registro => registro.tipo === 'erro'
+        ).length === 0"
+    >
+
+        <td
+            colspan="7"
+            class="px-6 py-14 text-center"
+        >
+
+            <div class="w-12 h-12 mx-auto
+                        rounded-full bg-red-50
+                        flex items-center justify-center
+                        text-red-400">
+
+                <i class="ph ph-warning-octagon text-2xl"></i>
+
+            </div>
+
+            <p class="mt-3 text-sm font-medium text-slate-600">
+                Nenhum erro cadastrado.
+            </p>
+
+            <p class="text-xs text-slate-400 mt-1">
+                Os erros encontrados aparecerão aqui.
+            </p>
+
+        </td>
+
+    </tr>
+
+</tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+    <!-- FRASES MOTIVACIONAIS -->
+    <section
+        x-show="currentTab === 'frases'"
+        x-cloak
+        class="p-6 md:p-10"
+    >
+
+        <!-- CABEÇALHO -->
+        <div class="flex flex-col sm:flex-row sm:items-center
+                    sm:justify-between gap-4 mb-8">
+
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900">
+                    Frases motivacionais
+                </h1>
+
+                <p class="text-sm text-slate-500 mt-1">
+                    Gerencie as frases exibidas diariamente aos estudantes.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                @click="abrirModalNovaFrase()"
+                class="inline-flex items-center justify-center gap-2
+                       bg-blue-600 hover:bg-blue-700
+                       text-white font-semibold
+                       px-5 py-3 rounded-xl
+                       shadow-sm transition"
+            >
+                <i class="ph-bold ph-plus"></i>
+
+                Nova frase
+            </button>
+
+        </div>
+
+
+        <!-- TABELA -->
+        <div class="bg-white border border-slate-200
+                    rounded-2xl shadow-sm overflow-hidden">
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full">
+
+                    <thead class="bg-slate-50 border-b border-slate-200">
+
+                        <tr class="text-left text-xs uppercase
+                                   tracking-wider text-slate-500">
+
+                            <th class="px-6 py-4 w-20">
+                                Nº
+                            </th>
+
+                            <th class="px-6 py-4">
+                                Frase
+                            </th>
+
+                            <th class="px-6 py-4 w-56">
+                                Autor
+                            </th>
+
+                            <th class="px-6 py-4 w-32 text-center">
+                                Ações
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody class="divide-y divide-slate-100">
+
+                        <template
+                            x-for="(item, index) in frases"
+                            :key="item.id"
+                        >
+
+                            <tr class="hover:bg-slate-50 transition">
+
+                                <!-- NÚMERO -->
+                                <td
+                                    class="px-6 py-5 text-sm
+                                           text-slate-500 font-medium"
+                                    x-text="index + 1"
+                                ></td>
+
+
+                                <!-- FRASE -->
+                                <td class="px-6 py-5">
+
+                                    <p
+                                        class="text-sm text-slate-800
+                                               leading-relaxed"
+                                        x-text="item.frase"
+                                    ></p>
+
+                                </td>
+
+
+                                <!-- AUTOR -->
+                                <td class="px-6 py-5">
+
+                                    <span
+                                        class="text-sm font-medium
+                                               text-slate-600 italic"
+                                        x-text="item.autor"
+                                    ></span>
+
+                                </td>
+
+
+                                <!-- AÇÕES -->
+                                <td class="px-6 py-5">
+
+                                    <div class="flex items-center
+                                                justify-center gap-2">
+
+                                        <!-- EDITAR -->
+                                        <button
+                                            type="button"
+                                            @click="editarFrase(item)"
+                                            title="Editar frase"
+                                            class="w-9 h-9 rounded-lg
+                                                   flex items-center justify-center
+                                                   text-blue-600
+                                                   hover:bg-blue-50
+                                                   transition"
+                                        >
+                                            <i class="ph-bold ph-pencil-simple"></i>
+                                        </button>
+
+
+                                        <!-- EXCLUIR -->
+                                        <button
+                                            type="button"
+                                            @click="excluirFrase(item)"
+                                            title="Excluir frase"
+                                            class="w-9 h-9 rounded-lg
+                                                   flex items-center justify-center
+                                                   text-red-500
+                                                   hover:bg-red-50
+                                                   transition"
+                                        >
+                                            <i class="ph-bold ph-trash"></i>
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        </template>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- NENHUMA FRASE -->
+            <div
+                x-show="frases.length === 0"
+                class="py-16 text-center"
+            >
+
+                <i class="ph ph-quotes text-4xl text-slate-300"></i>
+
+                <p class="mt-3 text-slate-500">
+                    Nenhuma frase motivacional cadastrada.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    
+</div>
+
+        </main>
+
+        <!-- MODAL DE EDIÇÃO DOS REGISTROS DO BANCO -->
+        <div x-show="adminModalAberto" x-cloak class="fixed inset-0 z-[180] flex items-center justify-center overflow-y-auto px-4 py-8">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="fecharModalAdmin()"></div>
+            <form @submit.prevent="salvarRegistroAdmin()" class="relative my-auto w-full max-w-2xl rounded-3xl bg-white shadow-2xl">
+                <div class="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+                    <h2 class="text-xl font-bold text-slate-900" x-text="adminModalTitulo"></h2>
+                    <button type="button" @click="fecharModalAdmin()" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><i class="ph-bold ph-x"></i></button>
+                </div>
+                <div class="grid max-h-[65vh] grid-cols-1 gap-4 overflow-y-auto px-6 py-5 sm:grid-cols-2">
+                    <template x-if="adminEditKind === 'usuarios'">
+                        <div class="contents">
+                            <label class="text-sm font-medium text-slate-700">Nome<input required x-model="adminForm.nome" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">E-mail<input required type="email" x-model="adminForm.email" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Data de nascimento<input type="date" x-model="adminForm.data_nascimento" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Série<input x-model="adminForm.serie" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Escola<input x-model="adminForm.escola" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Rede de ensino<input x-model="adminForm.rede_ensino" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Etapa SESI<input type="number" min="0" x-model="adminForm.etapa_sesi" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Trilha SESI<input x-model="adminForm.trilha_sesi" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Curso desejado<input x-model="adminForm.curso_desejado" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Universidade desejada<input x-model="adminForm.universidade_desejada" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Tipo de universidade<input x-model="adminForm.tipo_universidade" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700 sm:col-span-2">Objetivo geral<textarea rows="3" x-model="adminForm.objetivo_geral" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></textarea></label>
+                        </div>
+                    </template>
+                    <template x-if="adminEditKind === 'disciplinas'">
+                        <div class="contents">
+                            <label class="text-sm font-medium text-slate-700">Nome<input required x-model="adminForm.nome" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Área do conhecimento<input x-model="adminForm.area_conhecimento" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                        </div>
+                    </template>
+                    <template x-if="adminEditKind === 'planos-curso'">
+                        <div class="contents">
+                            <label class="text-sm font-medium text-slate-700">Ano letivo<input required type="number" min="2000" max="2100" x-model="adminForm.ano_letivo" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Série<input required type="number" min="1" x-model="adminForm.serie" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Etapa<input required type="number" min="1" x-model="adminForm.etapa" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Disciplina<select required x-model="adminForm.disciplina_id" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5"><option value="">Selecione</option><template x-for="disciplina in adminDisciplinas" :key="disciplina.id"><option :value="String(disciplina.id)" x-text="disciplina.nome"></option></template></select></label>
+                            <label class="text-sm font-medium text-slate-700">Versão<input x-model="adminForm.versao" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="text-sm font-medium text-slate-700">Trilha<input x-model="adminForm.trilha" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"></label>
+                            <label class="flex items-center gap-3 text-sm font-medium text-slate-700 sm:col-span-2"><input type="checkbox" x-model="adminForm.ativo" class="h-4 w-4 rounded border-slate-300 text-blue-600"> Plano ativo</label>
+                        </div>
+                    </template>
+                </div>
+                <div x-show="adminModalErro" x-text="adminModalErro" class="mx-6 mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+                <div class="flex justify-end gap-3 border-t border-slate-100 px-6 py-5">
+                    <button type="button" @click="fecharModalAdmin()" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancelar</button>
+                    <button type="submit" :disabled="adminSalvando" class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60" x-text="adminSalvando ? 'Salvando…' : 'Salvar alterações'"></button>
+                </div>
+            </form>
+        </div>
+
+
+        <!-- =========================================================
+             MENU MOBILE
+        ========================================================== -->
+        <div
+            x-show="mobileMenuOpen"
+            x-cloak
+            class="md:hidden fixed inset-0 z-50"
+        >
+            <!-- FUNDO -->
+            <div
+                @click="mobileMenuOpen = false"
+                class="absolute inset-0 bg-black/50"
+            ></div>
+
+            <!-- PAINEL -->
+            <aside
+                class="absolute left-0 top-0 h-full w-72 max-w-[85vw]
+                       bg-white shadow-2xl flex flex-col"
+            >
+                <div class="h-20 flex items-center justify-between px-5 border-b border-slate-100">
+                    <img
+                        src="img/logo_1.png"
+                        alt="Rota do Sucesso"
+                        class="h-16 w-auto object-contain"
+                    >
+
+                    <button
+                        @click="mobileMenuOpen = false"
+                        class="w-9 h-9 rounded-lg flex items-center justify-center
+                               text-slate-500 hover:bg-slate-100"
+                    >
+                        <i class="ph-bold ph-x text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="px-4 pt-4">
+                    <div class="flex items-center gap-3 px-3 py-3 rounded-2xl bg-blue-600 text-white">
+                        <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
+                            <i class="ph-bold ph-shield-check text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-blue-100 font-bold">
+                                Rota do Sucesso
+                            </p>
+                            <p class="font-bold text-sm">Administração</p>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="flex-1 overflow-y-auto admin-scroll px-4 py-4">
+
+                    <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Painel
+                    </p>
+
+                    <button
+                        @click="selecionarMenuMobile('dashboard')"
+                        :class="classeMenu('dashboard')"
+                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm mb-5"
+                    >
+                        <i class="ph ph-squares-four text-lg"></i>
+                        Visão geral
+                    </button>
+
+                    <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Gerenciamento
+                    </p>
+
+                    <div class="space-y-1 mb-5">
+                        <button @click="selecionarMenuMobile('usuarios')" :class="classeMenu('usuarios')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-users-three text-lg"></i> Usuários
+                        </button>
+
+                        <button @click="selecionarMenuMobile('turmas')" :class="classeMenu('turmas')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-chalkboard-teacher text-lg"></i> Turmas
+                        </button>
+
+                        <button @click="selecionarMenuMobile('administradores')" :class="classeMenu('administradores')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-identification-badge text-lg"></i> Administradores
+                        </button>
+                    </div>
+
+                    <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Conteúdo
+                    </p>
+
+                    <div class="space-y-1 mb-5">
+                        <button @click="selecionarMenuMobile('disciplinas')" :class="classeMenu('disciplinas')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-books text-lg"></i> Disciplinas
+                        </button>
+
+                        <button @click="selecionarMenuMobile('videos')" :class="classeMenu('videos')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-video-camera text-lg"></i> Vídeos
+                        </button>
+
+                        <button @click="selecionarMenuMobile('questoes')" :class="classeMenu('questoes')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-question text-lg"></i> Questões
+                        </button>
+
+                        <button @click="selecionarMenuMobile('frases')" :class="classeMenu('frases')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-quotes text-lg"></i> Frases motivacionais
+                        </button>
+
+                        <button @click="selecionarMenuMobile('planos-curso')" :class="classeMenu('planos-curso')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-notebook text-lg"></i> Planos de curso
+                        </button>
+                    </div>
+
+                    <p class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Sistema
+                    </p>
+
+                    <div class="space-y-1">
+                        <button @click="selecionarMenuMobile('relatorios')" :class="classeMenu('relatorios')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-chart-bar text-lg"></i> Relatórios
+                        </button>
+
+                        <button
+                            @click="selecionarMenuMobile('validacoes-erros')"
+                            :class="classeMenu('validacoes-erros')"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm"
+                        >
+                        <i class="ph ph-bug-beetle text-lg"></i>
+                        Validações e Erros
+                        </button>
+
+                        <button @click="selecionarMenuMobile('configuracoes')" :class="classeMenu('configuracoes')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                            <i class="ph ph-gear-six text-lg"></i> Configurações
+                        </button>
+                    </div>
+                </nav>
+
+                <div class="p-4 border-t border-slate-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                            <span x-text="inicialAdministrador"></span>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold truncate" x-text="primeiroNome"></p>
+                            <p class="text-[11px] text-blue-600 font-semibold">Administrador</p>
+                        </div>
+
+                        <button @click="sair()" class="text-red-500 p-2">
+                            <i class="ph-bold ph-sign-out text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+    </div>
+
+<!-- =========================================================
+     MODAL - CONFIRMAÇÃO VALIDAÇÃO / ERRO
+========================================================== -->
+
+<div
+    x-show="modalAvisoValidacaoAberto"
+    x-cloak
+    class="fixed inset-0 z-[150]
+           flex items-center justify-center
+           px-4"
+>
+
+    <!-- FUNDO -->
+    <div
+        class="absolute inset-0
+               bg-slate-900/60
+               backdrop-blur-sm"
+        @click="modalAvisoValidacaoAberto = false"
+    ></div>
+
+
+    <!-- JANELA -->
+    <div
+        @click.stop
+        class="relative bg-white
+               w-full max-w-md
+               rounded-3xl
+               shadow-2xl
+               overflow-hidden"
+    >
+
+        <!-- FAIXA SUPERIOR -->
+        <div
+            class="h-2"
+            :class="avisoValidacaoTipo === 'validacao'
+                ? 'bg-blue-600'
+                : 'bg-red-600'"
+        ></div>
+
+
+        <div class="p-7">
+
+            <!-- ÍCONE -->
+            <div
+                class="w-16 h-16
+                       mx-auto
+                       rounded-2xl
+                       flex items-center justify-center
+                       mb-5"
+                :class="avisoValidacaoTipo === 'validacao'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'bg-red-50 text-red-600'"
+            >
+
+                <i
+                    class="ph-bold text-3xl"
+                    :class="avisoValidacaoTipo === 'validacao'
+                        ? 'ph-check-circle'
+                        : 'ph-warning-circle'"
+                ></i>
+
+            </div>
+
+
+            <!-- TEXTO -->
+            <div class="text-center">
+
+                <h2
+                    class="text-xl font-bold
+                           text-slate-900"
+                    x-text="avisoValidacaoTitulo"
+                ></h2>
+
+                <p
+                    class="text-sm text-slate-500
+                           leading-relaxed mt-3"
+                    x-text="avisoValidacaoMensagem"
+                ></p>
+
+            </div>
+
+
+            <!-- INFO DE SEGURANÇA -->
+            <div
+                class="mt-6
+                       bg-slate-50
+                       border border-slate-200
+                       rounded-2xl
+                       p-4
+                       flex items-start gap-3"
+            >
+
+                <div
+                    class="w-9 h-9 rounded-xl
+                           bg-amber-50
+                           text-amber-600
+                           flex items-center justify-center
+                           flex-shrink-0"
+                >
+
+                    <i class="ph-bold ph-shield-check text-lg"></i>
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-sm font-semibold text-slate-800">
+                        Identificação necessária
+                    </p>
+
+                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                        O código de segurança permitirá registrar
+                        quem cadastrou esta informação no sistema.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTÕES -->
+            <div class="flex gap-3 mt-7">
+
+                <button
+                    type="button"
+                    @click="modalAvisoValidacaoAberto = false"
+                    class="flex-1
+                           px-5 py-3
+                           rounded-xl
+                           bg-slate-100
+                           hover:bg-slate-200
+                           text-slate-600
+                           font-semibold
+                           transition"
+                >
+                    Voltar
+                </button>
+
+
+                <button
+                    type="button"
+                    @click="abrirModalCodigoSeguranca()"
+                    class="flex-1
+                           px-5 py-3
+                           rounded-xl
+                           text-white
+                           font-semibold
+                           transition
+                           flex items-center
+                           justify-center gap-2"
+                    :class="avisoValidacaoTipo === 'validacao'
+                        ? 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-red-600 hover:bg-red-700'"
+                >
+
+                    <i class="ph-bold ph-key"></i>
+
+                    Informar código
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     MODAL - EDITAR VALIDAÇÃO / ERRO
+========================================================== -->
+
+<div
+    x-show="modalEditarValidacaoErroAberto"
+    x-cloak
+    class="fixed inset-0 z-[180]
+           flex items-center justify-center px-4"
+>
+
+    <!-- FUNDO -->
+    <div
+        class="absolute inset-0
+               bg-slate-900/60
+               backdrop-blur-sm"
+        @click="modalEditarValidacaoErroAberto = false"
+    ></div>
+
+
+    <!-- JANELA -->
+    <div
+        @click.stop
+        class="relative bg-white
+               w-full max-w-2xl
+               rounded-3xl shadow-2xl
+               overflow-hidden"
+    >
+
+        <!-- FAIXA SUPERIOR -->
+        <div
+            class="h-2"
+            :class="registroValidacaoErroParaEditar?.tipo === 'validacao'
+                ? 'bg-blue-600'
+                : 'bg-red-600'"
+        ></div>
+
+
+        <!-- CABEÇALHO -->
+        <div class="px-7 py-5
+                    border-b border-slate-200
+                    flex items-center justify-between">
+
+            <div class="flex items-center gap-4">
+
+                <div
+                    class="w-11 h-11 rounded-xl
+                           flex items-center justify-center"
+                    :class="registroValidacaoErroParaEditar?.tipo === 'validacao'
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'bg-red-50 text-red-600'"
+                >
+
+                    <i class="ph-bold ph-pencil-simple text-xl"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h2
+                        class="text-lg font-bold text-slate-900"
+                        x-text="registroValidacaoErroParaEditar?.tipo === 'validacao'
+                            ? 'Editar Validação'
+                            : 'Editar Erro de Sistema'"
+                    ></h2>
+
+                    <p class="text-sm text-slate-500 mt-0.5">
+                        Altere as informações do registro.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                @click="modalEditarValidacaoErroAberto = false"
+                class="w-9 h-9 rounded-lg
+                       text-slate-400
+                       hover:bg-slate-100
+                       hover:text-slate-600
+                       flex items-center justify-center
+                       transition"
+            >
+                <i class="ph-bold ph-x text-lg"></i>
+            </button>
+
+        </div>
+
+
+        <!-- FORMULÁRIO -->
+        <div class="p-7">
+
+            <!-- DESCRIÇÃO -->
+            <div>
+
+                <label class="block text-sm
+                              font-semibold text-slate-700 mb-2">
+
+                    Descrição
+
+                </label>
+
+
+                <textarea
+                    x-model="formEditarValidacaoErro.descricao"
+                    maxlength="1000"
+                    rows="6"
+                    class="w-full
+                           px-4 py-3
+                           border border-slate-300
+                           rounded-xl
+                           text-sm text-slate-700
+                           resize-none
+                           outline-none
+                           focus:ring-2
+                           focus:ring-blue-500/20
+                           focus:border-blue-500"
+                ></textarea>
+
+
+                <div class="text-right mt-1">
+
+                    <span
+                        class="text-xs text-slate-400"
+                        x-text="`${formEditarValidacaoErro.descricao.length} / 1000`"
+                    ></span>
+
+                </div>
+
+            </div>
+
+
+            <!-- IMPORTÂNCIA -->
+            <div class="mt-5">
+
+                <label class="block text-sm
+                              font-semibold text-slate-700 mb-2">
+
+                    Grau de importância
+
+                </label>
+
+
+                <select
+                    x-model="formEditarValidacaoErro.importancia"
+                    class="w-full
+                           px-4 py-3
+                           border border-slate-300
+                           rounded-xl
+                           text-sm text-slate-700
+                           bg-white
+                           outline-none
+                           focus:ring-2
+                           focus:ring-blue-500/20
+                           focus:border-blue-500"
+                >
+
+                    <option value="baixa">
+                        Baixa
+                    </option>
+
+                    <option value="media">
+                        Média
+                    </option>
+
+                    <option value="alta">
+                        Alta
+                    </option>
+
+                    <option value="critica">
+                        Crítica
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- BOTÕES -->
+            <div class="flex justify-end gap-3
+                        mt-7 pt-5
+                        border-t border-slate-100">
+
+                <button
+                    type="button"
+                    @click="modalEditarValidacaoErroAberto = false"
+                    class="px-6 py-3
+                           rounded-xl
+                           bg-slate-100
+                           hover:bg-slate-200
+                           text-slate-600
+                           font-semibold
+                           transition"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="button"
+                    @click="salvarEdicaoValidacaoErro()"
+                    :disabled="
+                        !formEditarValidacaoErro.descricao.trim() ||
+                        !formEditarValidacaoErro.importancia
+                    "
+                    class="px-6 py-3
+                           rounded-xl
+                           text-white
+                           font-semibold
+                           transition
+                           flex items-center gap-2
+                           disabled:opacity-50
+                           disabled:cursor-not-allowed"
+                    :class="registroValidacaoErroParaEditar?.tipo === 'validacao'
+                        ? 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-red-600 hover:bg-red-700'"
+                >
+
+                    <i class="ph-bold ph-floppy-disk"></i>
+
+                    Salvar alterações
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     MODAL - MARCAR COMO RESOLVIDO
+========================================================== -->
+
+<div
+    x-show="modalResolverValidacaoErroAberto"
+    x-cloak
+    class="fixed inset-0 z-[190]
+           flex items-center justify-center px-4"
+>
+
+    <!-- FUNDO -->
+    <div
+        class="absolute inset-0
+               bg-slate-900/60
+               backdrop-blur-sm"
+    ></div>
+
+
+    <!-- JANELA -->
+    <div
+        @click.stop
+        class="relative bg-white
+               w-full max-w-md
+               rounded-3xl
+               shadow-2xl
+               overflow-hidden"
+    >
+
+        <!-- FAIXA -->
+        <div class="h-2 bg-emerald-500"></div>
+
+
+        <div class="p-8">
+
+            <!-- ÍCONE -->
+            <div
+                class="w-16 h-16
+                       mx-auto rounded-2xl
+                       bg-emerald-50
+                       text-emerald-600
+                       flex items-center
+                       justify-center mb-5"
+            >
+
+                <i class="ph-bold ph-check-circle text-3xl"></i>
+
+            </div>
+
+
+            <!-- TÍTULO -->
+            <div class="text-center">
+
+                <h2 class="text-xl font-bold text-slate-900">
+
+                    Marcar como resolvido?
+
+                </h2>
+
+
+                <p
+                    class="text-sm text-slate-500
+                           leading-relaxed mt-2"
+                    x-text="registroValidacaoErroParaResolver?.tipo === 'validacao'
+                        ? 'Confirme que esta validação foi concluída.'
+                        : 'Confirme que este erro foi corrigido.'"
+                ></p>
+
+            </div>
+
+
+            <!-- REGISTRO -->
+            <div
+                class="mt-6
+                       bg-slate-50
+                       border border-slate-200
+                       rounded-2xl p-4"
+            >
+
+                <p
+                    class="text-xs font-semibold
+                           uppercase tracking-wider
+                           text-slate-400 mb-2"
+                >
+                    Registro
+                </p>
+
+
+                <p
+                    class="text-sm text-slate-700
+                           leading-relaxed"
+                    x-text="registroValidacaoErroParaResolver?.descricao || ''"
+                ></p>
+
+            </div>
+
+
+            <!-- CÓDIGO -->
+            <div class="mt-5">
+
+                <label
+                    class="block text-sm
+                           font-semibold
+                           text-slate-700 mb-2"
+                >
+                    Seu código de segurança
+                </label>
+
+
+                <input
+                    type="password"
+                    inputmode="numeric"
+                    maxlength="6"
+                    autocomplete="off"
+                    x-model="codigoResolverValidacaoErro"
+                    @input="
+                        codigoResolverValidacaoErro =
+                            codigoResolverValidacaoErro
+                                .replace(/\D/g, '')
+                                .slice(0, 6)
+                    "
+                    @keydown.enter="
+                        if (codigoResolverValidacaoErro.length === 6) {
+                            confirmarResolucaoValidacaoErro()
+                        }
+                    "
+                    placeholder="••••••"
+                    class="w-full
+                           px-4 py-4
+                           text-center
+                           tracking-[0.7em]
+                           text-lg font-bold
+                           border border-slate-300
+                           rounded-xl
+                           outline-none
+                           focus:ring-2
+                           focus:ring-emerald-500/20
+                           focus:border-emerald-500"
+                >
+
+
+                <p class="text-xs text-slate-400 text-center mt-2">
+
+                    Seu código identificará quem realizou a correção.
+
+                </p>
+
+            </div>
+
+
+            <!-- BOTÕES -->
+            <div class="flex gap-3 mt-7">
+
+                <button
+                    type="button"
+                    @click="
+                        modalResolverValidacaoErroAberto = false;
+                        registroValidacaoErroParaResolver = null;
+                        codigoResolverValidacaoErro = '';
+                    "
+                    class="flex-1
+                           px-5 py-3
+                           rounded-xl
+                           bg-slate-100
+                           hover:bg-slate-200
+                           text-slate-600
+                           font-semibold
+                           transition"
+                >
+
+                    Cancelar
+
+                </button>
+
+
+                <button
+                    type="button"
+                    @click="confirmarResolucaoValidacaoErro()"
+                    :disabled="codigoResolverValidacaoErro.length !== 6"
+                    class="flex-1
+                           px-5 py-3
+                           rounded-xl
+                           bg-emerald-500
+                           hover:bg-emerald-600
+                           text-white
+                           font-semibold
+                           transition
+                           flex items-center
+                           justify-center gap-2
+                           disabled:opacity-50
+                           disabled:cursor-not-allowed"
+                >
+
+                    <i class="ph-bold ph-check"></i>
+
+                    Confirmar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MODAL - RESOLUÇÃO CONCLUÍDA
+========================================================== -->
+
+<div
+    x-show="modalSucessoResolucaoAberto"
+    x-cloak
+    class="fixed inset-0 z-[200]
+           flex items-center justify-center px-4"
+>
+
+    <div
+        class="absolute inset-0
+               bg-slate-900/60
+               backdrop-blur-sm"
+    ></div>
+
+
+    <div
+        @click.stop
+        class="relative bg-white
+               w-full max-w-md
+               rounded-3xl
+               shadow-2xl
+               overflow-hidden"
+    >
+
+        <div class="h-2 bg-emerald-500"></div>
+
+
+        <div class="p-8">
+
+
+            <!-- ÍCONE -->
+            <div
+                class="w-16 h-16
+                       mx-auto rounded-2xl
+                       bg-emerald-50
+                       text-emerald-600
+                       flex items-center
+                       justify-center mb-5"
+            >
+
+                <i class="ph-bold ph-check-circle text-3xl"></i>
+
+            </div>
+
+
+            <!-- TEXTO -->
+            <div class="text-center">
+
+                <h2 class="text-xl font-bold text-slate-900">
+
+                    Registro concluído!
+
+                </h2>
+
+
+                <p
+                    class="text-sm text-slate-500
+                           leading-relaxed mt-2"
+                    x-text="tipoResolucaoRealizada === 'validacao'
+                        ? 'A validação foi marcada como concluída.'
+                        : 'O erro foi marcado como corrigido.'"
+                ></p>
+
+            </div>
+
+
+            <!-- RESPONSÁVEL -->
+            <div
+                class="mt-6
+                       bg-slate-50
+                       border border-slate-200
+                       rounded-2xl
+                       p-4
+                       flex items-center gap-4"
+            >
+
+                <div
+                    class="w-11 h-11
+                           rounded-full
+                           bg-emerald-50
+                           text-emerald-600
+                           flex items-center
+                           justify-center"
+                >
+
+                    <i class="ph-bold ph-user-check text-xl"></i>
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-xs text-slate-400 font-medium">
+
+                        Concluído por
+
+                    </p>
+
+                    <p
+                        class="text-sm font-bold
+                               text-slate-800 mt-0.5"
+                        x-text="resolucaoRealizadaPor"
+                    ></p>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTÃO -->
+            <button
+                type="button"
+                @click="modalSucessoResolucaoAberto = false"
+                class="w-full mt-7
+                       px-5 py-3
+                       rounded-xl
+                       bg-emerald-500
+                       hover:bg-emerald-600
+                       text-white
+                       font-semibold
+                       transition
+                       flex items-center
+                       justify-center gap-2"
+            >
+
+                <i class="ph-bold ph-check"></i>
+
+                Concluir
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MODAL - VALIDAÇÃO / ERRO
+========================================================== -->
+
+<div
+    x-show="modalValidacaoErroAberto"
+    x-cloak
+    class="fixed inset-0 z-[120]
+           flex items-center justify-center
+           px-4"
+>
+
+    <!-- FUNDO -->
+    <div
+        class="absolute inset-0
+               bg-slate-900/50
+               backdrop-blur-[2px]"
+        @click="fecharModalValidacaoErro()"
+    ></div>
+
+
+    <!-- JANELA -->
+    <div
+        @click.stop
+        class="relative bg-white
+               w-full max-w-2xl
+               rounded-2xl shadow-2xl
+               overflow-hidden"
+    >
+
+        <!-- CABEÇALHO -->
+        <div
+            class="flex items-start justify-between
+                   px-6 py-5
+                   border-b border-slate-200"
+        >
+
+            <div class="flex items-center gap-3">
+
+                <div
+                    class="w-11 h-11 rounded-xl
+                           flex items-center justify-center"
+                    :class="tipoValidacaoErro === 'validacao'
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'bg-red-50 text-red-600'"
+                >
+
+                    <i
+                        class="ph-bold text-xl"
+                        :class="tipoValidacaoErro === 'validacao'
+                            ? 'ph-check-square-offset'
+                            : 'ph-warning-octagon'"
+                    ></i>
+
+                </div>
+
+
+                <div>
+
+                    <h2
+                        class="text-xl font-bold text-slate-900"
+                        x-text="tipoValidacaoErro === 'validacao'
+                            ? 'Cadastrar Nova Validação'
+                            : 'Cadastrar Erro de Sistema'"
+                    ></h2>
+
+                    <p
+                        class="text-sm text-slate-500 mt-1"
+                        x-text="tipoValidacaoErro === 'validacao'
+                            ? 'Informe o que precisa ser validado pela equipe.'
+                            : 'Descreva o erro encontrado no sistema.'"
+                    ></p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                @click="fecharModalValidacaoErro()"
+                class="w-9 h-9 rounded-lg
+                       flex items-center justify-center
+                       text-slate-400
+                       hover:bg-slate-100
+                       hover:text-slate-700
+                       transition"
+            >
+
+                <i class="ph-bold ph-x text-lg"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- FORMULÁRIO -->
+        <form
+            @submit.prevent="prepararSalvarValidacaoErro()"
+            class="p-6"
+        >
+
+            <!-- DESCRIÇÃO -->
+            <div class="mb-6">
+
+                <label
+                    class="block text-sm
+                           font-semibold text-slate-700
+                           mb-2"
+                    x-text="tipoValidacaoErro === 'validacao'
+                        ? 'Descrição da validação'
+                        : 'Descrição do erro'"
+                ></label>
+
+                <textarea
+                    x-model="formValidacaoErro.descricao"
+                    rows="6"
+                    maxlength="1000"
+                    required
+                    :placeholder="tipoValidacaoErro === 'validacao'
+                        ? 'Ex.: Validar se o plano de estudos mantém corretamente os horários cadastrados pelo aluno...'
+                        : 'Ex.: Ao atualizar a página, o campo de período disponível perde as informações salvas...'"
+                    class="w-full px-4 py-3
+                           border border-slate-300
+                           rounded-xl
+                           text-sm text-slate-800
+                           resize-none
+                           outline-none
+                           focus:border-blue-500
+                           focus:ring-4
+                           focus:ring-blue-100
+                           transition"
+                ></textarea>
+
+                <div class="flex justify-end mt-1">
+
+                    <span
+                        class="text-xs text-slate-400"
+                        x-text="formValidacaoErro.descricao.length + ' / 1000'"
+                    ></span>
+
+                </div>
+
+            </div>
+
+
+            <!-- GRAU DE IMPORTÂNCIA -->
+            <div class="mb-7">
+
+                <label
+                    class="block text-sm
+                           font-semibold text-slate-700
+                           mb-2"
+                >
+                    Grau de importância
+                </label>
+
+                <select
+                    x-model="formValidacaoErro.importancia"
+                    required
+                    class="w-full px-4 py-3
+                           border border-slate-300
+                           rounded-xl
+                           bg-white
+                           text-sm text-slate-800
+                           outline-none
+                           focus:border-blue-500
+                           focus:ring-4
+                           focus:ring-blue-100
+                           transition"
+                >
+
+                    <option value="">
+                        Selecione o grau de importância
+                    </option>
+
+                    <option value="baixa">
+                        Baixa
+                    </option>
+
+                    <option value="media">
+                        Média
+                    </option>
+
+                    <option value="alta">
+                        Alta
+                    </option>
+
+                    <option value="critica">
+                        Crítica
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- RODAPÉ -->
+            <div
+                class="flex items-center justify-end
+                       gap-3 pt-5
+                       border-t border-slate-200"
+            >
+
+                <button
+                    type="button"
+                    @click="fecharModalValidacaoErro()"
+                    class="px-5 py-3
+                           rounded-xl
+                           text-sm font-semibold
+                           text-slate-600
+                           bg-slate-100
+                           hover:bg-slate-200
+                           transition"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="px-5 py-3
+                           rounded-xl
+                           text-white
+                           font-semibold text-sm
+                           transition
+                           flex items-center gap-2"
+                    :class="tipoValidacaoErro === 'validacao'
+                        ? 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-red-600 hover:bg-red-700'"
+                >
+
+                    <i class="ph-bold ph-floppy-disk"></i>
+
+                    Salvar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     MODAL - CÓDIGO DE SEGURANÇA
+========================================================== -->
+
+<div
+    x-show="modalCodigoSegurancaAberto"
+    x-cloak
+    class="fixed inset-0 z-[160]
+           flex items-center justify-center
+           px-4"
+>
+
+    <!-- FUNDO -->
+    <div
+        class="absolute inset-0
+               bg-slate-900/60
+               backdrop-blur-sm"
+    ></div>
+
+
+    <!-- JANELA -->
+    <div
+        @click.stop
+        class="relative bg-white
+               w-full max-w-md
+               rounded-3xl
+               shadow-2xl
+               overflow-hidden"
+    >
+
+        <!-- FAIXA -->
+        <div
+            class="h-2"
+            :class="tipoValidacaoErro === 'validacao'
+                ? 'bg-blue-600'
+                : 'bg-red-600'"
+        ></div>
+
+
+        <div class="p-8">
+
+            <!-- ÍCONE -->
+            <div
+                class="w-16 h-16
+                       mx-auto
+                       rounded-2xl
+                       bg-slate-100
+                       text-slate-700
+                       flex items-center justify-center
+                       mb-5"
+            >
+
+                <i class="ph-bold ph-key text-3xl"></i>
+
+            </div>
+
+
+            <!-- TEXTO -->
+            <div class="text-center mb-7">
+
+                <h2 class="text-xl font-bold text-slate-900">
+                    Código de segurança
+                </h2>
+
+                <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                    Digite seu código pessoal de 6 dígitos para
+                    confirmar sua identidade.
+                </p>
+
+            </div>
+
+
+            <!-- CAMPO -->
+            <div class="mb-7">
+
+                <label
+                    class="block text-sm font-semibold
+                           text-slate-700 mb-2"
+                >
+                    Seu código
+                </label>
+
+
+                <input
+                    type="password"
+                    inputmode="numeric"
+                    maxlength="6"
+                    autocomplete="off"
+
+                    x-model="codigoSeguranca"
+
+                    @input="
+                        codigoSeguranca =
+                            codigoSeguranca
+                                .replace(/\D/g, '')
+                                .slice(0, 6)
+                    "
+
+                    @keydown.enter.prevent="
+                        codigoSeguranca.length === 6
+                            && validarCodigoSeguranca()
+                    "
+
+                    placeholder="••••••"
+
+                    class="w-full
+                           px-4 py-4
+                           text-center
+                           text-2xl
+                           font-bold
+                           tracking-[0.5em]
+                           border border-slate-300
+                           rounded-xl
+                           outline-none
+                           focus:border-blue-500
+                           focus:ring-4
+                           focus:ring-blue-100
+                           transition"
+                >
+
+
+                <p class="text-xs text-slate-400 text-center mt-2">
+                    Código individual da equipe
+                </p>
+
+            </div>
+
+
+            <!-- BOTÕES -->
+            <div class="flex gap-3">
+
+                <button
+                    type="button"
+
+                    @click="
+                        modalCodigoSegurancaAberto = false;
+                        modalAvisoValidacaoAberto = true;
+                    "
+
+                    class="flex-1
+                           px-5 py-3
+                           rounded-xl
+                           bg-slate-100
+                           hover:bg-slate-200
+                           text-slate-600
+                           font-semibold
+                           transition"
+                >
+                    Voltar
+                </button>
+
+
+                <button
+                    type="button"
+
+                    @click="validarCodigoSeguranca()"
+
+                    :disabled="codigoSeguranca.length !== 6"
+
+                    :class="codigoSeguranca.length === 6
+                        ? (
+                            tipoValidacaoErro === 'validacao'
+                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                : 'bg-red-600 hover:bg-red-700 text-white'
+                          )
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
+
+                    class="flex-1
+                           px-5 py-3
+                           rounded-xl
+                           font-semibold
+                           transition
+                           flex items-center
+                           justify-center gap-2"
+                >
+
+                    <i class="ph-bold ph-shield-check"></i>
+
+                    Confirmar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     MODAL - CADASTRO REALIZADO COM SUCESSO
+========================================================== -->
+
+<div
+    x-show="modalSucessoCadastroAberto"
+    x-cloak
+    class="fixed inset-0 z-[170]
+           flex items-center justify-center px-4"
+>
+
+    <!-- FUNDO -->
+    <div
+        class="absolute inset-0
+               bg-slate-900/60
+               backdrop-blur-sm"
+    ></div>
+
+
+    <!-- JANELA -->
+    <div
+        @click.stop
+        class="relative bg-white
+               w-full max-w-md
+               rounded-3xl
+               shadow-2xl
+               overflow-hidden"
+    >
+
+        <!-- FAIXA SUPERIOR -->
+        <div
+            class="h-2"
+            :class="tipoValidacaoErro === 'validacao'
+                ? 'bg-blue-600'
+                : 'bg-red-600'"
+        ></div>
+
+
+        <div class="p-8">
+
+            <!-- ÍCONE -->
+            <div
+                class="w-16 h-16
+                       mx-auto rounded-2xl
+                       flex items-center justify-center
+                       mb-5"
+                :class="tipoValidacaoErro === 'validacao'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'bg-red-50 text-red-600'"
+            >
+
+                <i class="ph-bold ph-check-circle text-3xl"></i>
+
+            </div>
+
+
+            <!-- TÍTULO -->
+            <div class="text-center">
+
+                <h2
+                    class="text-xl font-bold text-slate-900"
+                    x-text="tipoValidacaoErro === 'validacao'
+                        ? 'Validação cadastrada!'
+                        : 'Erro cadastrado!'"
+                ></h2>
+
+                <p
+                    class="text-sm text-slate-500
+                           leading-relaxed mt-2"
+                    x-text="tipoValidacaoErro === 'validacao'
+                        ? 'A validação foi registrada com sucesso no sistema.'
+                        : 'O erro foi registrado com sucesso no sistema.'"
+                ></p>
+
+            </div>
+
+
+            <!-- RESPONSÁVEL -->
+            <div
+                class="mt-6
+                       bg-slate-50
+                       border border-slate-200
+                       rounded-2xl
+                       p-4
+                       flex items-center gap-4"
+            >
+
+                <div
+                    class="w-11 h-11
+                           rounded-full
+                           bg-emerald-50
+                           text-emerald-600
+                           flex items-center justify-center
+                           flex-shrink-0"
+                >
+
+                    <i class="ph-bold ph-user-check text-xl"></i>
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-xs text-slate-400 font-medium">
+                        Cadastrado por
+                    </p>
+
+                    <p
+                        class="text-sm font-bold text-slate-800 mt-0.5"
+                        x-text="cadastroRealizadoPor"
+                    ></p>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTÃO -->
+            <button
+                type="button"
+                @click="modalSucessoCadastroAberto = false"
+                class="w-full mt-7
+                       px-5 py-3
+                       rounded-xl
+                       text-white
+                       font-semibold
+                       transition
+                       flex items-center
+                       justify-center gap-2"
+                :class="tipoValidacaoErro === 'validacao'
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-red-600 hover:bg-red-700'"
+            >
+
+                <i class="ph-bold ph-check"></i>
+
+                Concluir
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+    <!-- =========================================================
+     MODAL - FRASE MOTIVACIONAL
+========================================================== -->
+<div
+    x-show="modalFraseAberto"
+    x-cloak
+    class="fixed inset-0 z-[100]
+           flex items-center justify-center
+           px-4"
+>
+
+    <!-- FUNDO ESCURO -->
+    <div
+        class="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"
+        @click="fecharModalFrase()"
+    ></div>
+
+
+    <!-- JANELA -->
+    <div
+        @click.stop
+        class="relative bg-white
+               w-full max-w-xl
+               rounded-2xl shadow-2xl
+               overflow-hidden"
+    >
+
+        <!-- CABEÇALHO -->
+        <div class="flex items-start justify-between
+                    px-6 py-5
+                    border-b border-slate-200">
+
+            <div>
+
+                <h2
+                    class="text-xl font-bold text-slate-900"
+                    x-text="modoEdicaoFrase
+                        ? 'Editar frase'
+                        : 'Nova frase motivacional'"
+                ></h2>
+
+                <p class="text-sm text-slate-500 mt-1">
+                    Informe a frase e o nome do autor.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                @click="fecharModalFrase()"
+                class="w-9 h-9 rounded-lg
+                       flex items-center justify-center
+                       text-slate-400
+                       hover:bg-slate-100
+                       hover:text-slate-700
+                       transition"
+            >
+                <i class="ph-bold ph-x text-lg"></i>
+            </button>
+
+        </div>
+
+
+        <!-- FORMULÁRIO -->
+        <form
+            @submit.prevent="salvarFrase()"
+            class="p-6"
+        >
+
+            <!-- FRASE -->
+            <div class="mb-5">
+
+                <label class="block text-sm font-semibold
+                              text-slate-700 mb-2">
+                    Frase
+                </label>
+
+                <textarea
+                    x-model="formFrase.frase"
+                    rows="5"
+                    maxlength="500"
+                    required
+                    placeholder="Digite a frase motivacional..."
+                    class="w-full px-4 py-3
+                           border border-slate-300
+                           rounded-xl
+                           text-sm text-slate-800
+                           resize-none
+                           outline-none
+                           focus:border-blue-500
+                           focus:ring-4
+                           focus:ring-blue-100
+                           transition"
+                ></textarea>
+
+            </div>
+
+
+            <!-- AUTOR -->
+            <div>
+
+                <label class="block text-sm font-semibold
+                              text-slate-700 mb-2">
+                    Autor
+                </label>
+
+                <input
+                    type="text"
+                    x-model="formFrase.autor"
+                    maxlength="150"
+                    required
+                    placeholder="Ex.: Albert Einstein"
+                    class="w-full px-4 py-3
+                           border border-slate-300
+                           rounded-xl
+                           text-sm text-slate-800
+                           outline-none
+                           focus:border-blue-500
+                           focus:ring-4
+                           focus:ring-blue-100
+                           transition"
+                >
+
+            </div>
+
+
+            <!-- BOTÕES -->
+            <div class="flex justify-end gap-3 mt-7">
+
+                <button
+                    type="button"
+                    @click="fecharModalFrase()"
+                    class="px-5 py-3
+                           rounded-xl
+                           border border-slate-300
+                           text-slate-700
+                           font-semibold text-sm
+                           hover:bg-slate-50
+                           transition"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="submit"
+                    :disabled="salvandoFrase"
+                    class="px-5 py-3
+                           rounded-xl
+                           bg-blue-600
+                           text-white
+                           font-semibold text-sm
+                           hover:bg-blue-700
+                           disabled:opacity-50
+                           transition
+                           flex items-center gap-2"
+                >
+
+                    <i
+                        class="ph-bold"
+                        :class="salvandoFrase
+                            ? 'ph-spinner animate-spin'
+                            : 'ph-check'"
+                    ></i>
+
+                    <span
+                        x-text="salvandoFrase
+                            ? 'Salvando...'
+                            : (modoEdicaoFrase
+                                ? 'Salvar alterações'
+                                : 'Adicionar frase')"
+                    ></span>
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     MODAL - CONFIRMAR EXCLUSÃO DE FRASE
+========================================================== -->
+
+<div
+    x-show="modalExcluirFraseAberto"
+    x-cloak
+    class="fixed inset-0 z-[110] flex items-center justify-center px-4"
+>
+
+    <!-- FUNDO -->
+    <div
+        class="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"
+        @click="fecharModalExcluirFrase()"
+    ></div>
+
+
+    <!-- JANELA -->
+    <div
+        @click.stop
+        class="relative bg-white w-full max-w-md
+               rounded-2xl shadow-2xl overflow-hidden"
+    >
+
+        <!-- CABEÇALHO -->
+        <div class="flex items-center gap-3 px-6 py-5 border-b border-slate-200">
+
+            <div class="w-10 h-10 rounded-xl bg-red-50
+                        flex items-center justify-center
+                        text-red-500">
+
+                <i class="ph-bold ph-trash text-xl"></i>
+
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">
+                    Excluir frase
+                </h2>
+
+                <p class="text-sm text-slate-500 mt-1">
+                    Confirme a exclusão da frase motivacional.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- CONTEÚDO -->
+        <div class="p-6">
+
+            <p class="text-sm text-slate-600 mb-4">
+                Tem certeza de que deseja excluir esta frase?
+            </p>
+
+
+            <!-- FRASE SELECIONADA -->
+            <div class="bg-slate-50 border border-slate-200
+                        rounded-xl p-4">
+
+                <p
+                    class="text-sm text-slate-800 leading-relaxed"
+                    x-text="fraseParaExcluir
+                        ? '“' + fraseParaExcluir.frase + '”'
+                        : ''"
+                ></p>
+
+                <p
+                    class="text-sm text-slate-500 italic mt-3"
+                    x-text="fraseParaExcluir
+                        ? '— ' + fraseParaExcluir.autor
+                        : ''"
+                ></p>
+
+            </div>
+
+
+            <!-- BOTÕES -->
+            <div class="flex justify-end gap-3 mt-6">
+
+                <button
+                    type="button"
+                    @click="fecharModalExcluirFrase()"
+                    :disabled="excluindoFrase"
+                    class="px-5 py-3 rounded-xl
+                           border border-slate-300
+                           text-slate-700 font-semibold text-sm
+                           hover:bg-slate-50 transition"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="button"
+                    @click="confirmarExclusaoFrase()"
+                    :disabled="excluindoFrase"
+                    class="px-5 py-3 rounded-xl
+                           bg-red-500 text-white
+                           font-semibold text-sm
+                           hover:bg-red-600
+                           disabled:opacity-50
+                           transition flex items-center gap-2"
+                >
+
+                    <i
+                        class="ph-bold"
+                        :class="excluindoFrase
+                            ? 'ph-spinner animate-spin'
+                            : 'ph-trash'"
+                    ></i>
+
+                    <span
+                        x-text="excluindoFrase
+                            ? 'Excluindo...'
+                            : 'Excluir frase'"
+                    ></span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     MODAL - EXCLUIR VALIDAÇÃO / ERRO
+========================================================== -->
+
+<div
+    x-show="modalExcluirValidacaoErroAberto"
+    x-cloak
+    class="fixed inset-0 z-[180]
+           flex items-center justify-center px-4"
+>
+
+    <!-- FUNDO -->
+    <div
+        class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+        @click="modalExcluirValidacaoErroAberto = false"
+    ></div>
+
+
+    <!-- JANELA -->
+    <div
+        @click.stop
+        class="relative bg-white
+               w-full max-w-md
+               rounded-3xl shadow-2xl
+               overflow-hidden"
+    >
+
+        <!-- FAIXA -->
+        <div class="h-2 bg-red-500"></div>
+
+
+        <div class="p-8">
+
+            <!-- ÍCONE -->
+            <div class="w-16 h-16 mx-auto
+                        rounded-2xl
+                        bg-red-50 text-red-500
+                        flex items-center justify-center mb-5">
+
+                <i class="ph-bold ph-trash text-3xl"></i>
+
+            </div>
+
+
+            <!-- TEXTO -->
+            <div class="text-center">
+
+                <h2 class="text-xl font-bold text-slate-900">
+                    Excluir registro?
+                </h2>
+
+                <p
+                    class="text-sm text-slate-500
+                           leading-relaxed mt-2"
+                    x-text="registroValidacaoErroParaExcluir?.tipo === 'validacao'
+                        ? 'Esta validação será excluída permanentemente.'
+                        : 'Este erro será excluído permanentemente.'"
+                ></p>
+
+            </div>
+
+
+            <!-- REGISTRO -->
+            <div class="mt-6
+                        bg-slate-50
+                        border border-slate-200
+                        rounded-2xl p-4">
+
+                <p class="text-xs font-semibold
+                          uppercase tracking-wider
+                          text-slate-400 mb-2">
+
+                    Registro selecionado
+
+                </p>
+
+                <p
+                    class="text-sm text-slate-700
+                           leading-relaxed"
+                    x-text="registroValidacaoErroParaExcluir?.descricao || ''"
+                ></p>
+
+            </div>
+
+
+            <!-- AVISO -->
+            <div class="mt-4 flex items-start gap-3
+                        bg-red-50 border border-red-100
+                        rounded-xl p-3">
+
+                <i class="ph-bold ph-warning
+                          text-red-500 mt-0.5"></i>
+
+                <p class="text-xs text-red-600 leading-relaxed">
+                    Esta ação não poderá ser desfeita.
+                </p>
+
+            </div>
+
+
+            <!-- BOTÕES -->
+            <div class="flex gap-3 mt-7">
+
+                <button
+                    type="button"
+                    @click="
+                        modalExcluirValidacaoErroAberto = false;
+                        registroValidacaoErroParaExcluir = null;
+                    "
+                    class="flex-1 px-5 py-3
+                           rounded-xl bg-slate-100
+                           hover:bg-slate-200
+                           text-slate-600 font-semibold
+                           transition"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="button"
+                    @click="confirmarExclusaoValidacaoErro()"
+                    class="flex-1 px-5 py-3
+                           rounded-xl bg-red-500
+                           hover:bg-red-600
+                           text-white font-semibold
+                           transition flex items-center
+                           justify-center gap-2"
+                >
+
+                    <i class="ph-bold ph-trash"></i>
+
+                    Excluir
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+    ========================================================== -->
+<script>
+        function adminApp() {
+            return {
+                usuarioId: null,
+                nome: 'Administrador',
+                email: '',
+                currentTab: 'dashboard',
+                mobileMenuOpen: false,
+                adminCarregando: false,
+                adminSalvando: false,
+                adminDataErro: '',
+                adminModalErro: '',
+                adminModalAberto: false,
+                adminModalTitulo: '',
+                adminEditKind: '',
+                adminEditId: null,
+                adminForm: {},
+                adminUsuarios: [],
+                adminAdministradores: [],
+                adminDisciplinas: [],
+                adminPlanosCurso: [],
+                resumoAdmin: {},
+                resumoAdminCards: [
+                    { chave: 'usuarios', rotulo: 'Usuários' },
+                    { chave: 'administradores', rotulo: 'Administradores' },
+                    { chave: 'disciplinas', rotulo: 'Disciplinas' },
+                    { chave: 'planos_curso', rotulo: 'Planos de curso' },
+                    { chave: 'cronogramas', rotulo: 'Cronogramas preenchidos' },
+                    { chave: 'objetivos', rotulo: 'Objetivos de estudo' }
+                ],
+                modalValidacaoErroAberto: false,
+                tipoValidacaoErro: 'validacao',
+                formValidacaoErro: {
+                    descricao: '',
+                    importancia: ''
+                },
+                modalAvisoValidacaoAberto: false,
+                avisoValidacaoTitulo: '',
+                avisoValidacaoMensagem: '',
+                avisoValidacaoTipo: 'validacao',
+                formEditarValidacaoErro: {
+                descricao: '',
+                importancia: ''
+                },
+
+                modalCodigoSegurancaAberto: false,
+                codigoSeguranca: '',
+                modalSucessoCadastroAberto: false,
+                cadastroRealizadoPor: '',
+                modalExcluirValidacaoErroAberto: false,
+                registroValidacaoErroParaExcluir: null,
+                modalResolverValidacaoErroAberto: false,
+            registroValidacaoErroParaResolver: null,
+
+            codigoResolverValidacaoErro: '',
+
+modalSucessoResolucaoAberto: false,
+resolucaoRealizadaPor: '',
+tipoResolucaoRealizada: '',
+
+                validacoesErros: [],
+                frases: [],
+
+                modalFraseAberto: false,
+                modoEdicaoFrase: false,
+                fraseEditandoId: null,
+                modalExcluirFraseAberto: false,
+                fraseParaExcluir: null,
+                excluindoFrase: false,
+                    formFrase: {
+                        frase: '',
+                        autor: ''
+                    },
+
+                salvandoFrase: false,
+
+                async initApp() {
+                    // Verifica se existe sessão
+                    const usuarioIdSalvo = sessionStorage.getItem('usuarioId');
+                    const tipoUsuarioSalvo = sessionStorage.getItem('tipoUsuario');
+
+                    if (!usuarioIdSalvo) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    // Impede usuário comum de abrir admin.html diretamente
+                    if (tipoUsuarioSalvo !== 'administrador') {
+                        window.location.href = 'main.html';
+                        return;
+                    }
+
+                    if (!sessionStorage.getItem('sessaoAdmin')) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    this.usuarioId = usuarioIdSalvo;
+
+                    await this.carregarAdministrador();
+                    await this.carregarResumoAdmin();
+                },
+
+                async carregarAdministrador() {
+                    try {
+                        const resposta = await fetch(`/api/perfil/${this.usuarioId}`);
+
+                        if (!resposta.ok) {
+                            console.error('Erro ao carregar dados do administrador:', resposta.status);
+                            return;
+                        }
+
+                        const dados = await resposta.json();
+
+                        if (dados.nome) {
+                            this.nome = dados.nome;
+                        }
+
+                        if (dados.email) {
+                            this.email = dados.email;
+                        }
+
+                    } catch (erro) {
+                        console.error('Erro ao carregar administrador:', erro);
+                    }
+                },
+
+                async apiAdmin(path, options = {}) {
+                    const headers = {
+                        Authorization: `Bearer ${sessionStorage.getItem('sessaoAdmin') || ''}`,
+                        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+                        ...(options.headers || {})
+                    };
+                    const resposta = await fetch(path, { ...options, headers });
+                    const dados = await resposta.json().catch(() => ({}));
+                    if (!resposta.ok) {
+                        if (resposta.status === 401 || resposta.status === 403) {
+                            sessionStorage.removeItem('sessaoAdmin');
+                            sessionStorage.removeItem('usuarioId');
+                            sessionStorage.removeItem('tipoUsuario');
+                            window.location.href = 'login.html';
+                        }
+                        throw new Error(dados.erro || 'Não foi possível acessar os dados administrativos.');
+                    }
+                    return dados;
+                },
+
+                async carregarResumoAdmin() {
+                    this.adminDataErro = '';
+                    try {
+                        this.resumoAdmin = await this.apiAdmin('/api/admin/dados/resumo');
+                    } catch (erro) {
+                        this.adminDataErro = erro.message;
+                    }
+                },
+
+                async carregarDadosAdmin(menu = this.currentTab) {
+                    const menusComUsuarios = ['usuarios', 'turmas'];
+                    if (!menusComUsuarios.includes(menu) && !['administradores', 'disciplinas', 'planos-curso'].includes(menu)) return;
+                    this.adminCarregando = true;
+                    this.adminDataErro = '';
+                    try {
+                        if (menusComUsuarios.includes(menu)) {
+                            const dados = await this.apiAdmin('/api/admin/dados/usuarios');
+                            this.adminUsuarios = dados.usuarios || [];
+                        } else if (menu === 'administradores') {
+                            const dados = await this.apiAdmin('/api/admin/dados/usuarios?tipo=administrador');
+                            this.adminAdministradores = dados.usuarios || [];
+                        } else if (menu === 'disciplinas') {
+                            const dados = await this.apiAdmin('/api/admin/dados/disciplinas');
+                            this.adminDisciplinas = dados.disciplinas || [];
+                        } else if (menu === 'planos-curso') {
+                            const [planos, disciplinas] = await Promise.all([
+                                this.apiAdmin('/api/admin/dados/planos-curso'),
+                                this.apiAdmin('/api/admin/dados/disciplinas')
+                            ]);
+                            this.adminPlanosCurso = planos.planos || [];
+                            this.adminDisciplinas = disciplinas.disciplinas || [];
+                        }
+                    } catch (erro) {
+                        this.adminDataErro = erro.message;
+                    } finally {
+                        this.adminCarregando = false;
+                    }
+                },
+
+                abrirEdicaoUsuario(item) {
+                    this.adminEditKind = 'usuarios';
+                    this.adminEditId = item.id;
+                    this.adminModalTitulo = item.tipo_usuario === 'administrador' ? 'Editar administrador' : 'Editar usuário';
+                    this.adminForm = {
+                        nome: item.nome || '',
+                        email: item.email || '',
+                        data_nascimento: item.data_nascimento || '',
+                        serie: item.serie || '',
+                        escola: item.escola || '',
+                        rede_ensino: item.rede_ensino || '',
+                        etapa_sesi: item.etapa_sesi ?? '',
+                        trilha_sesi: item.trilha_sesi || '',
+                        curso_desejado: item.curso_desejado || '',
+                        universidade_desejada: item.universidade_desejada || '',
+                        tipo_universidade: item.tipo_universidade || '',
+                        objetivo_geral: item.objetivo_geral || ''
+                    };
+                    this.adminModalErro = '';
+                    this.adminModalAberto = true;
+                },
+
+                abrirNovaDisciplina() {
+                    this.adminEditKind = 'disciplinas';
+                    this.adminEditId = null;
+                    this.adminModalTitulo = 'Nova disciplina';
+                    this.adminForm = { nome: '', area_conhecimento: '' };
+                    this.adminModalErro = '';
+                    this.adminModalAberto = true;
+                },
+
+                abrirEdicaoDisciplina(item) {
+                    this.adminEditKind = 'disciplinas';
+                    this.adminEditId = item.id;
+                    this.adminModalTitulo = 'Editar disciplina';
+                    this.adminForm = { nome: item.nome || '', area_conhecimento: item.area_conhecimento || '' };
+                    this.adminModalErro = '';
+                    this.adminModalAberto = true;
+                },
+
+                abrirNovoPlanoCurso() {
+                    this.adminEditKind = 'planos-curso';
+                    this.adminEditId = null;
+                    this.adminModalTitulo = 'Novo plano de curso';
+                    this.adminForm = {
+                        ano_letivo: new Date().getFullYear(), serie: '', etapa: '',
+                        disciplina_id: '', versao: '1', trilha: '', ativo: true
+                    };
+                    this.adminModalErro = '';
+                    this.adminModalAberto = true;
+                    if (!this.adminDisciplinas.length) this.carregarDadosAdmin('disciplinas');
+                },
+
+                abrirEdicaoPlanoCurso(item) {
+                    this.adminEditKind = 'planos-curso';
+                    this.adminEditId = item.id;
+                    this.adminModalTitulo = 'Editar plano de curso';
+                    this.adminForm = {
+                        ano_letivo: String(item.ano_letivo), serie: String(item.serie),
+                        etapa: String(item.etapa), disciplina_id: String(item.disciplina_id),
+                        versao: item.versao || '1', trilha: item.trilha || '', ativo: Boolean(item.ativo)
+                    };
+                    this.adminModalErro = '';
+                    this.adminModalAberto = true;
+                    if (!this.adminDisciplinas.length) this.carregarDadosAdmin('disciplinas');
+                },
+
+                fecharModalAdmin() {
+                    if (this.adminSalvando) return;
+                    this.adminModalAberto = false;
+                    this.adminModalErro = '';
+                    this.adminEditId = null;
+                    this.adminForm = {};
+                },
+
+                async salvarRegistroAdmin() {
+                    this.adminSalvando = true;
+                    this.adminModalErro = '';
+                    const recurso = this.adminEditKind;
+                    const base = `/api/admin/dados/${recurso}`;
+                    const endpoint = this.adminEditId ? `${base}/${this.adminEditId}` : base;
+                    try {
+                        await this.apiAdmin(endpoint, {
+                            method: this.adminEditId ? 'PUT' : 'POST',
+                            body: JSON.stringify(this.adminForm)
+                        });
+                        this.adminModalAberto = false;
+                        this.adminEditId = null;
+                        await this.carregarDadosAdmin(this.currentTab);
+                        await this.carregarResumoAdmin();
+                    } catch (erro) {
+                        this.adminModalErro = erro.message;
+                    } finally {
+                        this.adminSalvando = false;
+                    }
+                },
+
+                async excluirRegistroAdmin(recurso, item) {
+                    const nome = item.nome || item.disciplina || `registro ${item.id}`;
+                    if (!confirm(`Excluir ${nome}? Esta ação não pode ser desfeita.`)) return;
+                    this.adminDataErro = '';
+                    try {
+                        await this.apiAdmin(`/api/admin/dados/${recurso}/${item.id}`, { method: 'DELETE' });
+                        await this.carregarDadosAdmin(this.currentTab);
+                        await this.carregarResumoAdmin();
+                    } catch (erro) {
+                        this.adminDataErro = erro.message;
+                    }
+                },
+
+                async carregarValidacoesErros() {
+
+    try {
+
+        console.log("📋 Carregando validações e erros...");
+
+        const resposta = await fetch("/api/validacoes-erros");
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error(
+                dados.erro ||
+                "Não foi possível carregar as validações e erros."
+            );
+        }
+
+        this.validacoesErros = dados.registros || [];
+
+        console.log(
+            "✅ Validações e erros carregados:",
+            this.validacoesErros
+        );
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro ao carregar validações e erros:",
+            erro
+        );
+
+        this.validacoesErros = [];
+    }
+},
+
+
+            async carregarFrases() {
+    try {
+        const resposta = await fetch('/api/admin/frases');
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao buscar frases.');
+        }
+
+        const dados = await resposta.json();
+
+        if (dados.sucesso) {
+            this.frases = dados.frases;
+        }
+
+    } catch (erro) {
+        console.error('❌ Erro ao carregar frases:', erro);
+        this.frases = [];
+    }
+},
+            abrirModalNovaFrase() {
+
+                this.modoEdicaoFrase = false;
+                this.fraseEditandoId = null;
+                this.formFrase = {
+                    frase: '',
+                    autor: ''
+                };
+                this.modalFraseAberto = true;
+            },
+
+            editarFrase(item) {
+                this.modoEdicaoFrase = true;
+                this.fraseEditandoId = item.id;
+                this.formFrase = 
+                {
+                    frase: item.frase,
+                    autor: item.autor
+                };
+                this.modalFraseAberto = true;
+            },
+
+            async salvarFrase() {
+
+                const frase = this.formFrase.frase.trim();
+                const autor = this.formFrase.autor.trim();
+                if (!frase || !autor) {
+                    alert('Informe a frase e o autor.');
+                    return;
+                }
+            this.salvandoFrase = true;
+            try {
+                let resposta;
+
+        // ===============================
+        // EDITANDO
+        // ===============================
+            if (this.modoEdicaoFrase) {
+                resposta = await fetch(
+                `/api/admin/frases/${this.fraseEditandoId}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        frase,
+                        autor
+                    })
+                }
+            );
+
+        }
+
+
+        // ===============================
+        // NOVA FRASE
+        // ===============================
+        else {
+
+            resposta = await fetch(
+                '/api/admin/frases',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        frase,
+                        autor
+                    })
+                }
+            );
+
+        }
+
+        const dados = await resposta.json();
+
+            if (!resposta.ok) {
+                throw new Error(
+                 dados.erro || 'Não foi possível salvar a frase.'
+                );
+            }
+
+                // Fecha o modal
+                this.modalFraseAberto = false;
+                this.modoEdicaoFrase = false;
+                this.fraseEditandoId = null;
+                this.formFrase = {
+                    frase: '',
+                    autor: ''
+                };
+
+                // Atualiza a tabela
+                await this.carregarFrases();
+
+                } catch (erro) {
+                    console.error('❌ Erro ao salvar frase:', erro);
+                    alert(erro.message);
+                } finally {
+                    this.salvandoFrase = false;
+                }
+
+},
+
+excluirFrase(item) {
+    this.fraseParaExcluir = item;
+    this.modalExcluirFraseAberto = true;
+},
+
+abrirResolucaoValidacaoErro(item) {
+
+    this.registroValidacaoErroParaResolver = item;
+
+    this.codigoResolverValidacaoErro = '';
+
+    this.modalResolverValidacaoErroAberto = true;
+
+},
+
+async confirmarResolucaoValidacaoErro() {
+
+    if (!this.registroValidacaoErroParaResolver) {
+        return;
+    }
+
+
+    if (!/^\d{6}$/.test(this.codigoResolverValidacaoErro)) {
+        return;
+    }
+
+
+    try {
+
+        const id =
+            this.registroValidacaoErroParaResolver.id;
+
+
+        console.log(
+            "🔧 Marcando registro como resolvido:",
+            id
+        );
+
+
+        const resposta = await fetch(
+            `/api/validacoes-erros/${id}/resolver`,
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    codigo: this.codigoResolverValidacaoErro
+                })
+            }
+        );
+
+
+        const dados = await resposta.json();
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                dados.erro ||
+                "Não foi possível concluir o registro."
+            );
+
+        }
+
+
+        console.log(
+            "✅ Registro resolvido:",
+            dados
+        );
+
+
+        // Guarda os dados antes de limpar
+        this.resolucaoRealizadaPor =
+            dados.integrante.nome;
+
+        this.tipoResolucaoRealizada =
+            this.registroValidacaoErroParaResolver.tipo;
+
+
+        // Fecha o modal do código
+        this.modalResolverValidacaoErroAberto = false;
+
+
+        // Limpa os dados
+        this.codigoResolverValidacaoErro = '';
+
+        this.registroValidacaoErroParaResolver = null;
+
+
+        // Atualiza imediatamente as tabelas
+        await this.carregarValidacoesErros();
+
+
+        // Abre confirmação
+        this.modalSucessoResolucaoAberto = true;
+
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro ao concluir registro:",
+            erro
+        );
+
+        alert(
+            erro.message ||
+            "Não foi possível concluir o registro."
+        );
+
+        this.codigoResolverValidacaoErro = '';
+
+    }
+
+},
+
+abrirExclusaoValidacaoErro(item) {
+
+    this.registroValidacaoErroParaExcluir = item;
+
+    this.modalExcluirValidacaoErroAberto = true;
+
+},
+
+abrirEdicaoValidacaoErro(item) {
+
+    this.registroValidacaoErroParaEditar = item;
+
+    this.formEditarValidacaoErro = {
+        descricao: item.descricao,
+        importancia: item.importancia
+    };
+
+    this.modalEditarValidacaoErroAberto = true;
+
+},
+
+async salvarEdicaoValidacaoErro() {
+
+    if (!this.registroValidacaoErroParaEditar) {
+        return;
+    }
+
+
+    const descricao =
+        this.formEditarValidacaoErro.descricao.trim();
+
+    const importancia =
+        this.formEditarValidacaoErro.importancia;
+
+
+    if (!descricao || !importancia) {
+        return;
+    }
+
+
+    try {
+
+        const id =
+            this.registroValidacaoErroParaEditar.id;
+
+
+        console.log(
+            "✏️ Salvando alteração:",
+            id
+        );
+
+
+        const resposta = await fetch(
+            `/api/validacoes-erros/${id}`,
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    descricao,
+                    importancia
+                })
+            }
+        );
+
+
+        const dados = await resposta.json();
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                dados.erro ||
+                "Não foi possível alterar o registro."
+            );
+
+        }
+
+
+        console.log(
+            "✅ Registro alterado:",
+            dados.registro
+        );
+
+
+        // Fecha o modal
+        this.modalEditarValidacaoErroAberto = false;
+
+
+        // Limpa os dados da edição
+        this.registroValidacaoErroParaEditar = null;
+
+        this.formEditarValidacaoErro = {
+            descricao: '',
+            importancia: ''
+        };
+
+
+        // Atualiza imediatamente as tabelas
+        await this.carregarValidacoesErros();
+
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro ao alterar registro:",
+            erro
+        );
+
+        alert(
+            erro.message ||
+            "Não foi possível alterar o registro."
+        );
+
+    }
+
+},
+
+async confirmarExclusaoValidacaoErro() {
+
+    if (!this.registroValidacaoErroParaExcluir) {
+        return;
+    }
+
+    try {
+
+        const id = this.registroValidacaoErroParaExcluir.id;
+
+        console.log(
+            "🗑️ Excluindo validação/erro:",
+            id
+        );
+
+
+        const resposta = await fetch(
+            `/api/validacoes-erros/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+
+        const dados = await resposta.json();
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                dados.erro ||
+                "Não foi possível excluir o registro."
+            );
+
+        }
+
+
+        console.log(
+            "✅ Registro excluído:",
+            dados.registro
+        );
+
+
+        // Fecha o modal
+        this.modalExcluirValidacaoErroAberto = false;
+
+        // Limpa o registro selecionado
+        this.registroValidacaoErroParaExcluir = null;
+
+        // Atualiza imediatamente as tabelas
+        await this.carregarValidacoesErros();
+
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro ao excluir registro:",
+            erro
+        );
+
+        alert(
+            erro.message ||
+            "Não foi possível excluir o registro."
+        );
+
+    }
+
+},
+
+async validarCodigoSeguranca() {
+
+    // =====================================================
+    // 1. VALIDAR FORMATO
+    // =====================================================
+
+    if (!/^\d{6}$/.test(this.codigoSeguranca)) {
+        return;
+    }
+
+
+    try {
+
+        console.log("🔐 Validando código de segurança...");
+
+
+        // =====================================================
+        // 2. ENVIAR CÓDIGO AO SERVIDOR
+        // =====================================================
+
+        const resposta = await fetch(
+            "/api/equipe/validar-codigo",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    codigo: this.codigoSeguranca
+                })
+            }
+        );
+
+
+        const dados = await resposta.json();
+
+
+        // =====================================================
+        // 3. CÓDIGO INVÁLIDO
+        // =====================================================
+
+        if (!resposta.ok) {
+
+            console.warn(
+                "⚠️ Código recusado:",
+                dados.erro
+            );
+
+            alert(
+                dados.erro ||
+                "Código de segurança inválido."
+            );
+
+            this.codigoSeguranca = '';
+
+            return;
+        }
+
+
+        // =====================================================
+        // 4. INTEGRANTE IDENTIFICADO
+        // =====================================================
+
+        console.log("✅ Integrante identificado:", dados.integrante);
+
+
+// =====================================================
+// CADASTRA A VALIDAÇÃO APÓS IDENTIFICAR O INTEGRANTE
+// =====================================================
+
+const respostaCadastro = await fetch(
+    "/api/validacoes-erros",
+    {
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+    tipo: this.tipoValidacaoErro,
+    descricao: this.formValidacaoErro.descricao.trim(),
+    importancia: this.formValidacaoErro.importancia,
+    inserido_por: dados.integrante.id
+})
+    }
+);
+
+
+const dadosCadastro = await respostaCadastro.json();
+
+
+if (!respostaCadastro.ok) {
+
+    console.error(
+        "❌ Erro ao cadastrar validação:",
+        dadosCadastro
+    );
+
+    alert(
+        dadosCadastro.erro ||
+        "Não foi possível cadastrar a validação."
+    );
+
+    return;
+}
+
+
+console.log(
+    "✅ Validação cadastrada:",
+    dadosCadastro.registro
+);
+// Atualiza imediatamente as duas tabelas
+await this.carregarValidacoesErros();
+
+// Fecha todos os modais do processo
+this.modalCodigoSegurancaAberto = false;
+this.modalAvisoValidacaoAberto = false;
+this.modalValidacaoErroAberto = false;
+
+// Limpa o código de segurança
+this.codigoSeguranca = '';
+
+// Limpa o formulário
+this.formValidacaoErro = {
+    descricao: '',
+    importancia: ''
+};
+
+// Confirma o cadastro
+// Guarda quem realizou o cadastro
+this.cadastroRealizadoPor = dados.integrante.nome;
+
+// Abre o modal de sucesso
+this.modalSucessoCadastroAberto = true;
+
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro ao validar código:",
+            erro
+        );
+
+
+        alert(
+            "Não foi possível validar o código de segurança."
+        );
+
+    }
+
+},
+
+
+
+async confirmarExclusaoFrase() {
+
+    if (!this.fraseParaExcluir) {
+        return;
+    }
+
+    this.excluindoFrase = true;
+
+    try {
+
+        const resposta = await fetch(
+            `/api/admin/frases/${this.fraseParaExcluir.id}`,
+            {
+                method: 'DELETE'
+            }
+        );
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error(
+                dados.erro || 'Não foi possível excluir a frase.'
+            );
+        }
+
+        // Fecha o modal
+        this.modalExcluirFraseAberto = false;
+        this.fraseParaExcluir = null;
+
+        // Atualiza a tabela
+        await this.carregarFrases();
+
+    } catch (erro) {
+
+        console.error('❌ Erro ao excluir frase:', erro);
+        alert(erro.message);
+
+    } finally {
+
+        this.excluindoFrase = false;
+
+    }
+},
+
+fecharModalExcluirFrase() {
+
+    if (this.excluindoFrase) {
+        return;
+    }
+
+    this.modalExcluirFraseAberto = false;
+    this.fraseParaExcluir = null;
+},
+
+fecharModalFrase() {
+
+    if (this.salvandoFrase) {
+        return;
+    }
+
+    this.modalFraseAberto = false;
+
+    this.modoEdicaoFrase = false;
+    this.fraseEditandoId = null;
+
+    this.formFrase = {
+        frase: '',
+        autor: ''
+    };
+},
+
+abrirModalValidacaoErro(tipo) {
+
+    this.tipoValidacaoErro = tipo;
+
+    this.formValidacaoErro = {
+        descricao: '',
+        importancia: ''
+    };
+
+    this.modalValidacaoErroAberto = true;
+},
+
+
+fecharModalValidacaoErro() {
+
+    this.modalValidacaoErroAberto = false;
+
+    this.formValidacaoErro = {
+        descricao: '',
+        importancia: ''
+    };
+},
+
+abrirModalCodigoSeguranca() {
+
+    // Fecha o aviso anterior
+    this.modalAvisoValidacaoAberto = false;
+
+    // Limpa qualquer código digitado anteriormente
+    this.codigoSeguranca = '';
+
+    // Abre o modal do código
+    this.modalCodigoSegurancaAberto = true;
+
+},
+
+prepararSalvarValidacaoErro() {
+
+    const descricao =
+        String(this.formValidacaoErro.descricao || '').trim();
+
+    const importancia =
+        this.formValidacaoErro.importancia;
+
+
+    if (!descricao || !importancia) {
+
+        alert(
+            'Preencha a descrição e o grau de importância.'
+        );
+
+        return;
+    }
+
+
+    console.log('📋 Registro preparado:', {
+
+        tipo: this.tipoValidacaoErro,
+        descricao,
+        importancia
+
+    });
+
+
+    this.avisoValidacaoTipo = this.tipoValidacaoErro;
+    this.avisoValidacaoTitulo =
+    this.tipoValidacaoErro === 'validacao'
+        ? 'Validação pronta para cadastro'
+        : 'Erro pronto para cadastro';
+    this.avisoValidacaoMensagem =
+        'Os dados foram preenchidos corretamente. Para concluir o cadastro, será necessário informar seu código de segurança.';
+    this.modalAvisoValidacaoAberto = true;
+
+},
+
+
+get turmasAlunos() {
+    return this.adminUsuarios
+        .filter(item => item.tipo_usuario !== 'administrador' && (item.serie || item.escola || item.trilha_sesi))
+        .slice()
+        .sort((a, b) => {
+            const turmaA = [a.serie || '', a.etapa_sesi || a.etapa_atual || '', a.escola || '', a.trilha_sesi || ''].join('|');
+            const turmaB = [b.serie || '', b.etapa_sesi || b.etapa_atual || '', b.escola || '', b.trilha_sesi || ''].join('|');
+            return turmaA.localeCompare(turmaB, 'pt-BR') || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
+        });
+},
+
+selecionarMenu(menu) {
+
+    this.currentTab = menu;
+
+    this.carregarDadosAdmin(menu);
+    if (menu === 'dashboard') this.carregarResumoAdmin();
+
+    if (menu === 'frases') {
+        this.carregarFrases();
+    }
+
+     if (menu === 'validacoes-erros') {
+        this.carregarValidacoesErros();
+    }
+},
+                selecionarMenuMobile(menu) 
+                {
+                        this.currentTab = menu;
+                        this.mobileMenuOpen = false;
+                    this.carregarDadosAdmin(menu);
+                    if (menu === 'dashboard') this.carregarResumoAdmin();
+                    if (menu === 'frases') {
+                        this.carregarFrases();
+                    }
+                },
+
+                classeMenu(menu) {
+                    if (this.currentTab === menu) {
+                        return 'bg-blue-50 text-blue-600 font-semibold border border-blue-100 shadow-sm';
+                    }
+
+                    return 'text-slate-600 hover:bg-white/80 hover:text-slate-900';
+                },
+
+                sair() {
+                    sessionStorage.removeItem('usuarioId');
+                    sessionStorage.removeItem('tipoUsuario');
+                    sessionStorage.removeItem('sessaoAdmin');
+                    window.location.href = 'login.html';
+                },
+
+                get primeiroNome() {
+                    if (!this.nome) return 'Administrador';
+                    return this.nome.trim().split(/\s+/)[0];
+                },
+
+                get inicialAdministrador() {
+                    if (!this.nome) return 'A';
+                    return this.nome.trim().charAt(0).toUpperCase();
+                }
+            };
+        }
+    </script>
+
+</body>
+</html>

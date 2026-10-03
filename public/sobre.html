@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pt-BR" :class="{ 'dark': isDarkClass, 'hc': theme === 'hc' }" x-data="sobreApp()" style="scroll-behavior:smooth;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sobre | Rota do Sucesso</title>
+
+    <!-- Restaura o tema salvo antes da página aparecer, evitando "piscar" entre os temas -->
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('user_theme') || 'light';
+                if (t === 'dark') document.documentElement.classList.add('dark');
+                if (t === 'hc') document.documentElement.classList.add('hc');
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Configuração Tailwind (mesma do index.html) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', 800: '#1e293b', 900: '#0f172a', 950: '#020617'
+                        }
+                    }
+                }
+            },
+            plugins: [
+                function({ addVariant }) {
+                    addVariant('hc', 'html.hc &');
+                }
+            ]
+        }
+    </script>
+
+    <style>
+        /* Compensa o cabeçalho fixo ao navegar por âncoras (#como-funciona, #recursos) */
+        section[id] { scroll-margin-top: 6.5rem; }
+        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto !important; } }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col font-sans antialiased
+             bg-slate-50 text-slate-900
+             dark:bg-slate-950 dark:text-slate-100
+             hc:bg-black hc:text-white
+             selection:bg-blue-200 selection:text-blue-900
+             transition-colors duration-300">
+
+    <!-- =====================================================
+         CABEÇALHO (igual ao do index.html, com seletor de tema)
+    ====================================================== -->
+    <header class="w-full bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700
+                   dark:from-slate-950 dark:via-blue-950 dark:to-slate-950
+                   hc:bg-black hc:bg-none hc:border-b-2 hc:border-white
+                   shadow-lg sticky top-0 z-50 text-white transition-colors duration-300">
+
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+
+            <!-- LOGO -->
+            <a href="index.html" class="flex items-center group">
+                <img src="img/logo_1.png" alt="Rota Do Sucesso"
+                     class="h-14 sm:h-20 w-auto object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)] transition-transform duration-300 group-hover:scale-105">
+            </a>
+
+            <div class="flex items-center gap-2 sm:gap-4">
+
+                <!-- SELETOR RÁPIDO DE TEMA -->
+                <div class="flex items-center gap-1 bg-white/10 dark:bg-slate-900 hc:bg-black hc:border-2 hc:border-white p-1 rounded-xl border border-white/20 dark:border-slate-800 backdrop-blur-sm">
+                    <button @click="theme = 'light'"
+                            :class="theme === 'light' ? 'bg-white text-blue-600 shadow-sm' : 'text-blue-100 dark:text-slate-400 hc:text-white'"
+                            class="p-1.5 rounded-lg text-sm transition-all" title="Tema Claro" aria-label="Tema claro">
+                        <i class="ph-bold ph-sun"></i>
+                    </button>
+                    <button @click="theme = 'dark'"
+                            :class="theme === 'dark' ? 'bg-slate-800 text-blue-400 shadow-sm' : 'text-blue-100 dark:text-slate-400 hc:text-white'"
+                            class="p-1.5 rounded-lg text-sm transition-all" title="Tema Escuro" aria-label="Tema escuro">
+                        <i class="ph-bold ph-moon"></i>
+                    </button>
+                    <button @click="theme = 'hc'"
+                            :class="theme === 'hc' ? 'bg-yellow-400 text-black font-bold' : 'text-blue-100 dark:text-slate-400'"
+                            class="p-1.5 rounded-lg text-sm transition-all" title="Alto Contraste" aria-label="Alto contraste">
+                        <i class="ph-bold ph-circle-half-tilt"></i>
+                    </button>
+                </div>
+
+                <!-- VOLTAR -->
+                <a href="index.html"
+                   class="py-2 px-3 sm:px-4 bg-white text-blue-700 hover:bg-blue-50
+                          dark:bg-blue-600 dark:hover:bg-blue-500 dark:text-white
+                          hc:bg-yellow-400 hc:hover:bg-yellow-300 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400
+                          font-semibold text-xs sm:text-sm rounded-xl shadow-sm transition-all hover:-translate-y-0.5
+                          flex items-center gap-1 sm:gap-2 whitespace-nowrap">
+                    <i class="ph ph-arrow-left"></i>
+                    <span>Voltar ao início</span>
+                </a>
+
+            </div>
+        </div>
+    </header>
+
+
+    <!-- =====================================================
+         CONTEÚDO
+    ====================================================== -->
+    <main class="flex-1">
+
+        <!-- ================= INÍCIO ================= -->
+        <section id="inicio" class="px-6 pt-14 pb-12">
+            <div class="max-w-4xl mx-auto text-center">
+
+                <div class="inline-flex items-center gap-2 px-4 py-2 mb-5 rounded-full
+                            bg-blue-100 text-blue-700 border border-blue-200
+                            dark:bg-blue-950/80 dark:text-blue-400 dark:border-blue-800
+                            hc:bg-yellow-400 hc:text-black hc:border-yellow-400 hc:font-bold
+                            text-xs font-bold uppercase tracking-wider">
+                    <i class="ph ph-map-trifold text-base"></i>
+                    Sobre o projeto
+                </div>
+
+                <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight
+                           text-slate-900 dark:text-white hc:text-white">
+                    O Rota do Sucesso é a bússola da sua
+                    <span class="text-blue-600 dark:text-blue-400 hc:text-yellow-300">rotina de estudos</span>.
+                </h1>
+
+                <p class="mt-5 text-base md:text-lg max-w-2xl mx-auto leading-relaxed
+                          text-slate-500 dark:text-slate-400 hc:text-white">
+                    Uma plataforma que organiza suas matérias, cronometra suas sessões de foco
+                    e usa inteligência artificial para transformar seus objetivos em um plano de
+                    estudos claro — para você chegar à aprovação sem se perder no caminho.
+                </p>
+
+                <!-- Atalhos para as seções -->
+                <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+                    <a href="#como-funciona"
+                       class="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm
+                              hover:bg-blue-700 transition-all hover:-translate-y-0.5 shadow-sm
+                              dark:hover:bg-blue-500
+                              hc:bg-yellow-400 hc:text-black hc:font-bold hc:border-2 hc:border-yellow-400 hc:hover:bg-yellow-300">
+                        Como funciona
+                    </a>
+                    <a href="#recursos"
+                       class="px-5 py-2.5 rounded-xl bg-white text-blue-700 border border-slate-200 font-semibold text-sm
+                              hover:bg-blue-50 transition-all hover:-translate-y-0.5
+                              dark:bg-slate-900 dark:text-blue-400 dark:border-slate-800 dark:hover:bg-slate-800
+                              hc:bg-black hc:text-white hc:border-2 hc:border-white hc:hover:bg-white hc:hover:text-black">
+                        Recursos
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- POR QUE EXISTIMOS -->
+        <section class="px-6 py-12 border-y transition-colors duration-300
+                        bg-white border-slate-200
+                        dark:bg-slate-900/50 dark:border-slate-800
+                        hc:bg-black hc:border-white">
+            <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+
+                <div>
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                bg-blue-100 text-blue-600
+                                dark:bg-blue-950 dark:text-blue-400
+                                hc:bg-yellow-400 hc:text-black">
+                        <i class="ph-bold ph-compass"></i>
+                    </div>
+
+                    <h2 class="text-2xl font-bold mb-3 text-slate-900 dark:text-white hc:text-white">
+                        Por que criamos o Rota do Sucesso
+                    </h2>
+
+                    <p class="leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                        Grande parte do desafio de estudar para o ENEM, um vestibular ou um
+                        concurso não é falta de vontade — é falta de organização. São
+                        matérias demais, prazos apertados e uma rotina que muda toda semana.
+                        Sem um plano claro, é fácil procrastinar ou estudar sem direção.
+                    </p>
+                </div>
+
+                <div>
+                    <p class="leading-relaxed mb-4 text-slate-500 dark:text-slate-400 hc:text-white">
+                        Por isso construímos uma plataforma que entende o seu ponto de partida
+                        e transforma isso em uma rota de estudos personalizada, que se ajusta
+                        conforme sua evolução — sem excesso de distrações e sem complicação.
+                    </p>
+                    <p class="leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                        Nossa ideia é simples: cada estudante tem um ritmo, um objetivo e uma
+                        rotina diferentes. O Rota do Sucesso existe para traçar o caminho que
+                        faz sentido para o seu.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= COMO FUNCIONA ================= -->
+        <section id="como-funciona" class="px-6 py-16">
+            <div class="max-w-5xl mx-auto">
+
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3 text-slate-900 dark:text-white hc:text-white">
+                        Como a plataforma organiza sua rotina
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">
+                        Do cadastro até o dia a dia de estudos, em três etapas.
+                    </p>
+                </div>
+
+                <div class="relative grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                    <div class="hidden md:block absolute top-8 left-[16.5%] right-[16.5%] h-0.5
+                                bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200
+                                dark:from-blue-950 dark:via-blue-700 dark:to-blue-950
+                                hc:bg-none hc:bg-white"></div>
+
+                    <!-- Etapa 1 -->
+                    <div class="relative text-center">
+                        <div class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-2xl mb-5 relative z-10
+                                    bg-blue-600 text-white shadow-lg shadow-blue-600/30
+                                    hc:bg-yellow-400 hc:text-black hc:shadow-none">
+                            <i class="ph-bold ph-user-focus"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">1. Conte seus objetivos</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Ao criar a conta, você monta seu perfil acadêmico: qual prova quer
+                            passar, sua série e como é a sua rotina hoje.
+                        </p>
+                    </div>
+
+                    <!-- Etapa 2 -->
+                    <div class="relative text-center">
+                        <div class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-2xl mb-5 relative z-10
+                                    bg-blue-600 text-white shadow-lg shadow-blue-600/30
+                                    hc:bg-yellow-400 hc:text-black hc:shadow-none">
+                            <i class="ph-bold ph-map-trifold"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">2. Receba sua rota</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Com base no seu perfil e nas suas preferências de cronograma, a IA
+                            monta uma proposta de estudos pensada para o seu objetivo.
+                        </p>
+                    </div>
+
+                    <!-- Etapa 3 -->
+                    <div class="relative text-center">
+                        <div class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-2xl mb-5 relative z-10
+                                    bg-blue-600 text-white shadow-lg shadow-blue-600/30
+                                    hc:bg-yellow-400 hc:text-black hc:shadow-none">
+                            <i class="ph-bold ph-trophy"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">3. Estude com foco</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Você acompanha sua evolução por matéria e ajusta a rota sempre que
+                            precisar, sem perder o ritmo.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= RECURSOS ================= -->
+        <section id="recursos" class="px-6 py-16 transition-colors duration-300
+                                      bg-slate-100/70 dark:bg-slate-900/40 hc:bg-black hc:border-y hc:border-white">
+            <div class="max-w-5xl mx-auto">
+
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3 text-slate-900 dark:text-white hc:text-white">
+                        O que você encontra na plataforma
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400 hc:text-yellow-300">
+                        Ferramentas pensadas para tirar o estudo do papel e colocá-lo na rotina.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- Perfil acadêmico -->
+                    <div class="p-7 rounded-2xl border shadow-sm transition-colors
+                                bg-white border-slate-200
+                                dark:bg-slate-900 dark:border-slate-800
+                                hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                    bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 hc:bg-yellow-400 hc:text-black">
+                            <i class="ph-bold ph-graduation-cap"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">Perfil acadêmico</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Um perfil com os seus objetivos e a sua rotina, que serve de base
+                            para todo o planejamento da plataforma e pode ser editado quando quiser.
+                        </p>
+                    </div>
+
+                    <!-- Assistente IA -->
+                    <div class="p-7 rounded-2xl border shadow-sm transition-colors
+                                bg-white border-slate-200
+                                dark:bg-slate-900 dark:border-slate-800
+                                hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                    bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 hc:bg-yellow-400 hc:text-black">
+                            <i class="ph-bold ph-sparkle"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">Assistente IA</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Gera um cronograma de estudos por dia da semana com base no seu perfil
+                            e nas preferências que você salvou — e pode gerar outro sempre que precisar.
+                        </p>
+                    </div>
+
+                    <!-- Cronograma personalizado -->
+                    <div class="p-7 rounded-2xl border shadow-sm transition-colors
+                                bg-white border-slate-200
+                                dark:bg-slate-900 dark:border-slate-800
+                                hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                    bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 hc:bg-yellow-400 hc:text-black">
+                            <i class="ph-bold ph-calendar-check"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">Cronograma personalizado</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Você escolhe como prefere estudar e o cronograma organiza suas matérias
+                            por dia, com espaço para a sua rotina pessoal também.
+                        </p>
+                    </div>
+
+                    <!-- Sessões de foco -->
+                    <div class="p-7 rounded-2xl border shadow-sm transition-colors
+                                bg-white border-slate-200
+                                dark:bg-slate-900 dark:border-slate-800
+                                hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                    bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 hc:bg-yellow-400 hc:text-black">
+                            <i class="ph-bold ph-timer"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">Sessões de foco</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Cronômetro no estilo Pomodoro para estudar em blocos, com pausas
+                            que ajudam a manter a concentração.
+                        </p>
+                    </div>
+
+                    <!-- Matérias e calendário -->
+                    <div class="p-7 rounded-2xl border shadow-sm transition-colors
+                                bg-white border-slate-200
+                                dark:bg-slate-900 dark:border-slate-800
+                                hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                    bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 hc:bg-yellow-400 hc:text-black">
+                            <i class="ph-bold ph-books"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">Matérias e calendário</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Cadastre as matérias que você estuda e acompanhe tudo em um calendário
+                            de estudos, sem perder prazos nem compromissos.
+                        </p>
+                    </div>
+
+                    <!-- Estatísticas -->
+                    <div class="p-7 rounded-2xl border shadow-sm transition-colors
+                                bg-white border-slate-200
+                                dark:bg-slate-900 dark:border-slate-800
+                                hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                    bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 hc:bg-yellow-400 hc:text-black">
+                            <i class="ph-bold ph-chart-line-up"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">Estatísticas e desempenho</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Veja seu tempo total de foco, sua sequência de dias estudados e onde
+                            você tem mais dificuldade, para ajustar a rota com segurança.
+                        </p>
+                    </div>
+
+                    <!-- Dicas de estudo -->
+                    <div class="p-7 rounded-2xl border shadow-sm transition-colors
+                                bg-white border-slate-200
+                                dark:bg-slate-900 dark:border-slate-800
+                                hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                    bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 hc:bg-yellow-400 hc:text-black">
+                            <i class="ph-bold ph-lightbulb"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">Dicas de estudo</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Técnicas como Pomodoro, revisão espaçada e recordação ativa para
+                            fixar o conteúdo por mais tempo.
+                        </p>
+                    </div>
+
+                    <!-- Frase do dia -->
+                    <div class="p-7 rounded-2xl border shadow-sm transition-colors
+                                bg-white border-slate-200
+                                dark:bg-slate-900 dark:border-slate-800
+                                hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                    bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 hc:bg-yellow-400 hc:text-black">
+                            <i class="ph-bold ph-quotes"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">Frase motivacional do dia</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Todo dia uma frase nova no seu painel para dar aquele empurrão
+                            antes de começar a estudar.
+                        </p>
+                    </div>
+
+                    <!-- Acessibilidade -->
+                    <div class="p-7 rounded-2xl border shadow-sm transition-colors
+                                bg-white border-slate-200
+                                dark:bg-slate-900 dark:border-slate-800
+                                hc:bg-black hc:border-2 hc:border-white hc:shadow-none">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5
+                                    bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 hc:bg-yellow-400 hc:text-black">
+                            <i class="ph-bold ph-palette"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-slate-900 dark:text-white hc:text-white">Feito para todo mundo</h3>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                            Temas claro, escuro e de alto contraste, para você estudar do seu
+                            jeito, com conforto visual. Experimente no topo desta página!
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- PARA QUEM É -->
+        <section class="px-6 py-16">
+            <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+
+                <div class="order-2 md:order-1">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-4 text-slate-900 dark:text-white hc:text-white">
+                        Para quem é o Rota do Sucesso
+                    </h2>
+                    <p class="leading-relaxed mb-4 text-slate-500 dark:text-slate-400 hc:text-white">
+                        A plataforma foi pensada para estudantes que estão se preparando para o
+                        ENEM, vestibulares e concursos, mas também para quem só quer organizar
+                        melhor a rotina escolar do dia a dia.
+                    </p>
+                    <p class="leading-relaxed text-slate-500 dark:text-slate-400 hc:text-white">
+                        Se o seu desafio é lembrar o que estudar, quando estudar e como manter
+                        o foco, o Rota do Sucesso foi feito para você.
+                    </p>
+                </div>
+
+                <div class="order-1 md:order-2 grid grid-cols-2 gap-4">
+                    <div class="rounded-2xl p-6 text-center bg-blue-50 dark:bg-slate-900 dark:border dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white">
+                        <i class="ph-bold ph-exam text-3xl text-blue-600 dark:text-blue-400 hc:text-yellow-300"></i>
+                        <p class="text-sm font-semibold mt-3 text-slate-700 dark:text-slate-200 hc:text-white">ENEM</p>
+                    </div>
+                    <div class="rounded-2xl p-6 text-center bg-blue-50 dark:bg-slate-900 dark:border dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white">
+                        <i class="ph-bold ph-student text-3xl text-blue-600 dark:text-blue-400 hc:text-yellow-300"></i>
+                        <p class="text-sm font-semibold mt-3 text-slate-700 dark:text-slate-200 hc:text-white">Vestibulares</p>
+                    </div>
+                    <div class="rounded-2xl p-6 text-center bg-blue-50 dark:bg-slate-900 dark:border dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white">
+                        <i class="ph-bold ph-briefcase text-3xl text-blue-600 dark:text-blue-400 hc:text-yellow-300"></i>
+                        <p class="text-sm font-semibold mt-3 text-slate-700 dark:text-slate-200 hc:text-white">Concursos</p>
+                    </div>
+                    <div class="rounded-2xl p-6 text-center bg-blue-50 dark:bg-slate-900 dark:border dark:border-slate-800 hc:bg-black hc:border-2 hc:border-white">
+                        <i class="ph-bold ph-backpack text-3xl text-blue-600 dark:text-blue-400 hc:text-yellow-300"></i>
+                        <p class="text-sm font-semibold mt-3 text-slate-700 dark:text-slate-200 hc:text-white">Rotina escolar</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- DE ONDE VIEMOS -->
+        <section class="px-6 py-16 bg-slate-900 text-white dark:bg-slate-900/60 hc:bg-black hc:border-y hc:border-white">
+            <div class="max-w-4xl mx-auto text-center">
+
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-white/10 hc:bg-yellow-400 hc:text-black flex items-center justify-center text-2xl mb-6">
+                    <i class="ph-bold ph-buildings"></i>
+                </div>
+
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">De onde viemos</h2>
+
+                <p class="text-slate-300 hc:text-white leading-relaxed max-w-2xl mx-auto">
+                    O Rota do Sucesso é um projeto educacional desenvolvido por estudantes do
+                    SESI Rinaldo Campos Soares, em Ipatinga - MG. Ele nasceu da vontade de
+                    resolver, com tecnologia, um problema que a gente mesmo vive todos os dias
+                    como estudantes: organizar os estudos em meio a uma rotina cheia de tarefas.
+                </p>
+
+            </div>
+        </section>
+
+        <!-- CTA FINAL -->
+        <section class="px-6 py-16">
+            <div class="max-w-4xl mx-auto rounded-3xl p-8 sm:p-12 text-center text-white shadow-xl
+                        bg-gradient-to-br from-blue-700 to-indigo-800
+                        dark:from-blue-950 dark:to-slate-900 dark:border dark:border-slate-800
+                        hc:bg-black hc:bg-none hc:border-2 hc:border-white hc:shadow-none">
+
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">
+                    Quer ver sua rota de estudos na prática?
+                </h2>
+                <p class="text-blue-100 hc:text-white max-w-xl mx-auto mb-8">
+                    Crie sua conta gratuitamente e comece a organizar seus estudos hoje mesmo.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="create_account.html"
+                       class="px-7 py-3.5 rounded-xl bg-white text-blue-700 font-bold hover:bg-blue-50
+                              hc:bg-yellow-400 hc:text-black hc:border-2 hc:border-yellow-400 hc:hover:bg-yellow-300
+                              transition-all duration-300 flex items-center gap-2">
+                        <span>Criar minha conta</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+
+                    <a href="login.html"
+                       class="px-7 py-3.5 rounded-xl bg-amber-400 text-slate-900 font-bold hover:bg-amber-300
+                              hc:border-2 hc:border-amber-300
+                              transition-all duration-300 flex items-center gap-2">
+                        <i class="ph ph-sign-in"></i>
+                        <span>Já tenho conta</span>
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         RODAPÉ
+    ====================================================== -->
+    <footer class="border-t py-5 px-6 transition-colors duration-300
+                   bg-white border-slate-200
+                   dark:bg-slate-950 dark:border-slate-800
+                   hc:bg-black hc:border-white">
+
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs
+                    text-slate-500 dark:text-slate-400 hc:text-white">
+
+            <span>© 2026 Rota do Sucesso.</span>
+
+            <a href="index.html" class="hover:text-blue-600 dark:hover:text-blue-400 hc:hover:text-yellow-300 transition-colors">
+                Voltar para o início
+            </a>
+
+        </div>
+
+    </footer>
+
+    <!-- Lógica Alpine.js (mesma lógica de tema do index.html) -->
+    <script>
+        function sobreApp() {
+            return {
+                theme: (function () {
+                    try { return localStorage.getItem('user_theme') || 'light'; } catch (e) { return 'light'; }
+                })(),
+                isSystemDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+
+                init() {
+                    this.$watch('theme', value => {
+                        try { localStorage.setItem('user_theme', value); } catch (e) {}
+                    });
+                },
+
+                get isDarkClass() {
+                    return this.theme === 'dark';
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

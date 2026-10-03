@@ -1,0 +1,36 @@
+[x-cloak] { display: none !important; }
+
+/* Força a cor clara em TODOS os elementos no Modo Escuro */
+.dark,
+.dark body,
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark p,
+.dark span,
+.dark label,
+.dark input {
+    color: #f8fafc !important; /* Slate 50: Branco suave de alto contraste */
+}
+
+/* Subtítulos ou textos secundários no Modo Escuro */
+.dark .text-slate-500,
+.dark .text-slate-400 {
+    color: #cbd5e1 !important; /* Slate 300: Cinza claro bem legível */
+}
+
+.glass-panel {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+
+.hc ::-webkit-scrollbar { width: 8px; }
+.hc ::-webkit-scrollbar-thumb { background: #ffffff; border-radius: 0; border: 1px solid #000; }
+.hc ::-webkit-scrollbar-track { background: #000000; border-left: 1px solid #333; }
